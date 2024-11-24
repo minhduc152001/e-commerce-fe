@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-muli;
+  @apply w-[420px] mx-auto;
+}
+
+.bg-flash-sale {
+  background-image: url(https://content.pancake.vn/1/s920x118/fwebp/72/97/30/c5/85a6c79791fe48974c8d6da615a523c9e47cade8247ba2c6f94866ee.jpg);
+  background-position-x: center;
+  background-position-y: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: initial;
+  background-origin: content-box;
+  background-clip: border-box;
+}
+
+.coupon-transform {
+  transform: rotate(147deg) perspective(1000px);
+}
+
+.countdown-item {
+  background: rgba(255, 248, 248, 1);
+  color: rgba(253, 163, 84, 1);
+  font-size: 20px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.animate-pulse {
+  animation: pulse 0.6s cubic-bezier(0.4, 0.7, 0.6, 1) infinite;
+}
