@@ -20,4 +20,4 @@ jobs:
 
       - name: Deploy application
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 "cd ./e-commerce-apps/frontend && git pull origin main && npm i && npm run build && pm2 serve 3000 --name e-commerce-frontend"
+          ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 "cd ./e-commerce-apps/frontend && docker-compose up --build -d"
