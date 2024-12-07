@@ -14,12 +14,8 @@ COPY . .
 # Step 5: Build the application
 RUN npm run build
 
-# Step 6: Use an nginx image to serve the static files
-FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
-
 # Expose the default port for nginx
 EXPOSE 80
 
 # Start the nginx server
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]
