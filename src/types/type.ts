@@ -13,3 +13,25 @@ export type TCity = {
   Name: string;
   Districts: TDistrict[];
 };
+
+export type TProductTier = {
+  id: string;
+  productId: string;
+  quantity: number;
+  description: string;
+  price: number;
+  shippingFee: number;
+};
+
+export type TCartItem = {
+  id: string;
+  productId: string;
+  quantity: number;
+  attributeId: string;
+};
+
+export type TSize = {
+  sizeName: string;
+  weight: string;
+  height: string;
+};

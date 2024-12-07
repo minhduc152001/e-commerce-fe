@@ -1,14 +1,28 @@
-import { EyeFilled, HeartFilled } from "@ant-design/icons";
-import { Avatar, Button, Carousel, Image } from "antd";
+import { EyeFilled, HeartFilled, MinusOutlined } from "@ant-design/icons";
+import { Avatar, Button, Carousel, Image, Table } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { formatPrice, formatShortNumber } from "../utils/format";
 import ImageFeedbackShow from "../components/ImageFeedbackShow";
 import CreateOrder from "../components/CreateOrder";
 import Footer from "../components/Footer";
+import { TProduct, TReview } from "../constants/type";
+import {
+  getProductAPI,
+  listReviewsByProductAPI,
+  listTiersByProductAPI,
+} from "../api/axios";
+import { toast } from "react-toastify";
+import { TProductTier } from "../types/type";
+import LoadingPage from "./LoadingPage";
 
 const DetailedProductPage = () => {
   const { id } = useParams();
+  const [product, setProduct] = useState<TProduct>();
+  const [reviews, setReviews] = useState<TReview[]>();
+  const [displayingReviews, setDisplayingReviews] = useState(reviews);
+  const [productTiers, setProductTiers] = useState<TProductTier[]>();
+
   let currentSaleEndTime = Number(localStorage.getItem("saleEndTime")) || null;
   const nextSaleEndTime = Date.now() + (2 * 60 * 60 + 15 * 60) * 1000; // 2 hours & 36 minutes for flash sale
   if (!currentSaleEndTime || currentSaleEndTime < Date.now()) {
@@ -19,7 +33,7 @@ const DetailedProductPage = () => {
   const [timeLeft, setTimeLeft] = useState(
     (currentSaleEndTime - Date.now()) / 1000
   );
-  const [visibleSizeImage, setVisibleSizeImage] = useState(false);
+  const [visibleProductImage, setVisibleProductImage] = useState(false);
   const randomNumbers = [768, 819, 810, 799, 789, 801, 796];
   const [watchingPeopleCount, setWatchingPeopleCount] = useState<number>(
     randomNumbers[0]
@@ -34,92 +48,6 @@ const DetailedProductPage = () => {
       sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-
-  const product = {
-    id,
-    name: "SÉT ĐỒ THỜI TRANG DÀNH CHO NỮ TRUNG NIÊN",
-    description: " Chất liệu cao cấp . Đường may tinh xảo",
-    price: 499000,
-    discountPercentage: 50,
-    images: [
-      "https://content.pancake.vn/1/s840x914/fwebp0/21/e4/5b/c2/fc032eacb4c20861ecfae26fd69fa16bb0805d9e7de3a200f607d67c.png",
-      "https://content.pancake.vn/1/s840x914/fwebp0/82/c2/d7/51/4834ef3d38db7b0f4fd6472594208fd7386235bdd5ae2d5eff847bd3.png",
-    ],
-    details: [
-      "Rich in natural ingredients.",
-      "Promotes energy and mental clarity.",
-      "Improves overall health.",
-    ],
-    soldCount: 7923,
-    rating: 4.9,
-    voteCount: 2300,
-    sizeImage:
-      "https://content.pancake.vn/1/s840x914/fwebp0/2f/60/ab/3a/5fcfe9a80056304d1a6304e1acf564afd278af986c4c805742360da1.png",
-    sizes: [
-      "Size S: (38-45kg)",
-      "Size M: (46-54kg)",
-      "Size L: (54-62kg)",
-      "Size XL: (63-70kg)",
-      "Size 2XL: (70-80kg)",
-      "Size 3XL: (80-90kg)",
-    ],
-    codes: [
-      {
-        codeName: "MÃ TN11",
-        image:
-          "https://content.pancake.vn/1/s446x446/fwebp/c4/82/43/db/3eb70fbe5d5d145d18fd0f6289b17ed2423aa7690805d1800e678f4d.png",
-      },
-      {
-        codeName: "MÃ TN12",
-        image:
-          "https://content.pancake.vn/1/s446x446/fwebp/67/71/68/19/84725a54b9cde8305e2a0e37a6575f80d0428fb0405cee07d62a415c.png",
-      },
-      {
-        codeName: "MÃ TN13",
-        image:
-          "https://content.pancake.vn/1/s446x446/fwebp/6f/ce/66/0d/6b973f64ba9deab24b49d520a31a43fdd572af3576de6b01baa8de34.png",
-      },
-    ],
-  };
-
-  const reviews = [
-    {
-      userId: "1",
-      avatarUrl:
-        "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
-      name: "Minh Duc",
-      rating: 3,
-      content:
-        "Shop tư vấn kĩ và chính xác. Set đồ giống hình và chất vải cũng rất đẹp, đường may khá chắc chắn, giá tiền hợp lý, nên mua nhé mọi ng. Mình sẽ ủng hộ thêm",
-      mediaResources: [
-        "https://content.pancake.vn/1/s840x914/fwebp0/21/e4/5b/c2/fc032eacb4c20861ecfae26fd69fa16bb0805d9e7de3a200f607d67c.png",
-        "https://content.pancake.vn/1/s840x914/fwebp0/82/c2/d7/51/4834ef3d38db7b0f4fd6472594208fd7386235bdd5ae2d5eff847bd3.png",
-      ],
-    },
-    {
-      userId: "2",
-      avatarUrl:
-        "https://bcw-media.s3.ap-northeast-1.amazonaws.com/text_to_image_topbanner_mb_1_f66b5f345b.jpg",
-      name: "Tuan A",
-      rating: 5,
-      content: "OK",
-      mediaResources: [
-        "https://content.pancake.vn/1/s840x914/fwebp0/82/c2/d7/51/4834ef3d38db7b0f4fd6472594208fd7386235bdd5ae2d5eff847bd3.png",
-        "https://content.pancake.vn/1/s840x914/fwebp0/82/c2/d7/51/4834ef3d38db7b0f4fd6472594208fd7386235bdd5ae2d5eff847bd3.png",
-        "https://content.pancake.vn/1/s840x914/fwebp0/21/e4/5b/c2/fc032eacb4c20861ecfae26fd69fa16bb0805d9e7de3a200f607d67c.png",
-      ],
-    },
-    {
-      userId: "3",
-      avatarUrl:
-        "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
-      name: "Anh Anh",
-      rating: 5,
-      content:
-        "Cảm ơn shop, màu nâu nhìn rất sang, đúng tone màu của năm nay. Shop tư vấn nhiệt tình, giao hàng cũng nhanh nữa",
-      mediaResources: [],
-    },
-  ];
 
   const FilledStarCustom = (
     <img
@@ -162,6 +90,59 @@ const DetailedProductPage = () => {
 
     return stars;
   };
+
+  const ratingCount = reviews?.length || 0;
+  const productRating =
+    reviews && ratingCount
+      ? reviews.reduce((cur, acc) => cur + acc.rating, 0) / ratingCount
+      : "Chưa có đánh giá";
+
+  const sizeImageTableData = product?.sizes?.map(
+    ({ height, weight, sizeName }, key) => ({
+      key,
+      sizeName,
+      weight,
+      height,
+    })
+  );
+  const sizeImageTableColumns = [
+    {
+      title: "Size",
+      dataIndex: "sizeName",
+      key: "sizeName",
+    },
+    {
+      title: "Cân nặng",
+      dataIndex: "weight",
+      key: "weight",
+    },
+    {
+      title: "Chiều cao",
+      dataIndex: "height",
+      key: "height",
+    },
+  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!id) return;
+
+        const product = await getProductAPI(id);
+        setProduct(product);
+
+        const reviews = await listReviewsByProductAPI(id);
+        setReviews(reviews);
+        setDisplayingReviews(reviews);
+
+        const tiers = await listTiersByProductAPI(id);
+        setProductTiers(tiers);
+      } catch (error) {
+        toast.error("Có lỗi xảy ra. Hãy thử lại");
+      }
+    };
+    fetchData();
+  }, [id]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -206,16 +187,23 @@ const DetailedProductPage = () => {
   };
   const time = formatTime(timeLeft);
 
+  if (!product) return <LoadingPage />;
+
+  const productImages = [];
+  const mainProductImage = product.productImage;
+  mainProductImage && productImages.push(mainProductImage);
+  productImages.push(...(product.attributes?.map((attr) => attr.image) || []));
+
   return (
-    <div className="mx-auto relative bottom-16">
+    <div className="mx-auto">
       {/* Product Images */}
       <div>
         <div className="space-x-2">
-          <Carousel arrows infinite={false} draggable dots>
-            {product.images.map((image, index) => (
+          <Carousel arrows infinite={true} draggable dots>
+            {productImages.map((img, index) => (
               <Image
                 key={index}
-                src={image}
+                src={img}
                 alt={`Product Thumbnail ${index + 1}`}
                 width={420}
                 height={457}
@@ -238,7 +226,9 @@ const DetailedProductPage = () => {
           </div>
 
           <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
-            {formatPrice((product.price * product.discountPercentage) / 100)}
+            {formatPrice(
+              (product.price * (100 - product.discountPercentage)) / 100
+            )}
           </div>
 
           {/* text FLASH SALE */}
@@ -332,17 +322,19 @@ const DetailedProductPage = () => {
         <div className="flex mt-1 items-center">
           <div className="mr-2">{FilledStarCustom}</div>
           <div className="text-[15px]">
-            <span className="font-bold">{product.rating}/</span>
-            <span>5</span>
+            {ratingCount && (
+              <>
+                <span className="font-bold">{productRating}/</span>
+                <span>5</span>
+              </>
+            )}
             <span className="ml-1 text-[rgb(15,195,193)]">
-              ({formatShortNumber(product.voteCount)})
+              ({formatShortNumber(ratingCount)})
             </span>
 
             <span className="ml-6 font-bold">|</span>
             <span className="ml-2">Đã bán</span>
-            <span className="ml-1 font-bold">
-              {formatShortNumber(product.soldCount)}
-            </span>
+            <span className="ml-1 font-bold">{formatShortNumber(7200)}</span>
           </div>
         </div>
       </div>
@@ -393,24 +385,24 @@ const DetailedProductPage = () => {
       </div>
 
       <div className="px-4 border-[#e2e2e2] border-b-2 pb-3">
-        {/* Xem bảng kích cỡ - size image */}
+        {/* Xem ảnh sản phẩm - main product image */}
         <div className="py-2 cursor-pointer">
           <div
             className="text-base font-bold"
-            onClick={() => setVisibleSizeImage(true)}
+            onClick={() => setVisibleProductImage(true)}
           >
-            Xem bảng kích cỡ
+            Xem ảnh sản phẩm
           </div>
-          {visibleSizeImage && (
+          {visibleProductImage && mainProductImage && (
             <Image
               width={200}
               style={{ display: "none" }}
-              src={product.sizeImage}
+              src={mainProductImage}
               preview={{
-                visible: visibleSizeImage,
-                src: product.sizeImage,
+                visible: visibleProductImage,
+                src: mainProductImage,
                 onVisibleChange: (value) => {
-                  setVisibleSizeImage(value);
+                  setVisibleProductImage(value);
                 },
               }}
             />
@@ -463,28 +455,46 @@ const DetailedProductPage = () => {
           className="py-0.5 flex items-center justify-between"
         >
           <div className="text-base font-bold mb-1">
-            Đánh giá của khách hàng ({formatShortNumber(product.voteCount)})
+            Đánh giá của khách hàng ({formatShortNumber(ratingCount)})
           </div>
           <div className="text-sm">Xem thêm {">"}</div>
         </div>
         {/* Hiện số sao rating */}
-        <div className="flex gap-2 items-center mb-2">
-          <div className="text-sm">{product.rating}/5</div>
-          <div className="flex">{generateStars(product.rating)}</div>
-        </div>
+        {ratingCount && (
+          <div className="flex gap-2 items-center mb-2">
+            <div className="text-sm">
+              {productRating}
+              /5
+            </div>
+            <div className="flex">
+              {generateStars(Number(productRating) || 0)}
+            </div>
+          </div>
+        )}
         {/* Reviews */}
-        {reviews.map((el, i) => (
+        {displayingReviews?.map((el, i) => (
           <div className="border-b border-[#b9b9b9] py-2">
             <div className="px-6 py-2">
               <div className="flex items-center gap-2 mb-2">
-                <Avatar src={<img src={el.avatarUrl} alt="avatar" />} />
-                <div>{el.name}</div>
+                <Avatar
+                  src={
+                    <img
+                      src={
+                        el.reviewerImage ||
+                        // a default avatar
+                        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.iconfinder.com%2Ficons%2F403017%2Favatar_default_head_person_unknown_user_anonym_icon&psig=AOvVaw2nkz09L6vcMZcUgTWgzKmh&ust=1733410089284000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDe3IOujooDFQAAAAAdAAAAABAo"
+                      }
+                      alt="avatar"
+                    />
+                  }
+                />
+                <div>{el.reviewerName}</div>
               </div>
               <div className="flex mb-2 text-sm">
                 {generateStars(el.rating)}
               </div>
               <div className="text-[15px]">{el.content}</div>
-              <ImageFeedbackShow images={el.mediaResources} />
+              <ImageFeedbackShow images={el.images} />
             </div>
           </div>
         ))}
@@ -492,42 +502,69 @@ const DetailedProductPage = () => {
         {/* Đánh giá của khách hàng dành cho cửa hàng */}
         <div className="text-[15px] font-bold text-center my-2">
           Đánh giá của khách hàng dành cho cửa hàng (
-          {formatShortNumber(product.voteCount)})
+          {formatShortNumber(Number(productRating) || 0)})
         </div>
         <div className="flex justify-between px-2">
-          {[5, 4, 3, 2, 1].map((rating) => (
-            <div className="flex gap-1 border border-[rgba(45,45,45,1)] rounded-lg p-1">
-              <div className="flex">
-                {rating}
-                {FilledStarCustom}
+          {reviews &&
+            [5, 4, 3, 2, 1].map((rating) => (
+              <div
+                className="flex gap-1 border border-[rgba(45,45,45,1)] rounded-lg p-1 cursor-pointer"
+                onClick={() =>
+                  setDisplayingReviews(() =>
+                    reviews?.filter((review) => review.rating === rating)
+                  )
+                }
+              >
+                <div className="flex">
+                  {rating}
+                  {FilledStarCustom}
+                </div>
+                <div>
+                  (
+                  {formatShortNumber(
+                    reviews.filter((el) => el.rating === rating).length
+                  )}
+                  )
+                </div>
               </div>
-              <div>
-                (
-                {formatShortNumber(
-                  reviews.filter((el) => el.rating === rating).length
-                )}
-                )
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 
+      {/* Mô tả */}
       <div
         className="border-[#e2e2e2] border-t-2 py-6
         flex flex-col gap-3
         "
       >
+        <div>{product.description}</div>
         <Image.PreviewGroup>
-          {product.images.map((el) => (
+          {productImages.map((el) => (
             <Image preview={false} src={el} />
           ))}
-          <Image src={product.sizeImage} />
         </Image.PreviewGroup>
       </div>
 
+      {/* Bảng kích cỡ (nếu có) */}
+      {sizeImageTableData && (
+        <div className="mb-6">
+          <div className="font-bold">Bảng kích cỡ size</div>
+          <Table
+            columns={sizeImageTableColumns}
+            dataSource={sizeImageTableData}
+            pagination={false}
+            bordered
+          />
+        </div>
+      )}
+
       <div ref={orderSectionRef}>
-        <CreateOrder product={product} time={time} />
+        <CreateOrder
+          product={product}
+          productImages={productImages}
+          tiers={productTiers || []}
+          time={time}
+        />
       </div>
 
       {/* CAM KẾT VÀ CHÍNH SÁCH BÁN HÀNG */}
@@ -589,14 +626,16 @@ const DetailedProductPage = () => {
         </div>
       </div>
 
-      <Footer />
+      <div className="mb-16">
+        <Footer />
+      </div>
 
       {/* Fixed box for quick checkout/order */}
       <div className="fixed w-[420px] h-[67px] z-10 bottom-0 bg-white">
         <div className="flex h-full items-center justify-between border shadow-[0px_0px_8px_0px_rgba(0,0,0,0.250)] border-solid">
           <div className="flex mx-4 gap-6">
             <div
-              // onClick={() => handleScroll(shopSectionRef)}
+              onClick={() => (window.location.href = "/")}
               className="cursor-pointer flex flex-col items-center justify-center"
             >
               <img
@@ -604,7 +643,7 @@ const DetailedProductPage = () => {
                 src="../../assets/svg/blackShop.svg"
                 alt=""
               />
-              <div className="text-[10px]">Cửa hàng</div>
+              <div className="text-[10px]">Trang chủ</div>
             </div>
 
             <div
