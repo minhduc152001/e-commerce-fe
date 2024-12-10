@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Expose the default port for nginx
-EXPOSE 80
+EXPOSE 12345
 
 # Start the nginx server
-CMD ["npm", "start"]
+CMD ["npm", "run", "serve"]
