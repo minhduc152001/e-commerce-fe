@@ -15,9 +15,9 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Deploy application
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 << 'EOF'
-          sudo docker pull minhduc152001/e-commerce-frontend:latest
-          sudo docker stop e-commerce-frontend-container || true
-          sudo docker rm e-commerce-frontend-container || true
-          sudo docker run -d --name e-commerce-frontend-container -p 12345:80 minhduc152001/e-commerce-frontend:latest
-          EOF
+          # ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 << 'EOF'
+          # sudo docker pull minhduc152001/e-commerce-frontend:latest
+          # sudo docker stop e-commerce-frontend-container || true
+          # sudo docker rm e-commerce-frontend-container || true
+          # sudo docker run -d --name e-commerce-frontend-container -p 12345:80 minhduc152001/e-commerce-frontend:latest
+          # EOF

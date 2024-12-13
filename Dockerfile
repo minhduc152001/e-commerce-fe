@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Step 3: Copy package.json and install dependencies
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --production
 
 # Step 4: Copy the application code
 COPY . .
@@ -15,7 +15,7 @@ COPY . .
 RUN npm run build
 
 # Expose the default port for nginx
-EXPOSE 80
+EXPOSE 3000
 
 # Start the nginx server
 CMD ["npm", "run", "serve"]

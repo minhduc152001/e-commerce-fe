@@ -4,6 +4,6 @@ services:
   e-commerce-frontend:
     build: .
     ports:
-      - "12345:80"
+      - "3000:3000"
     restart: always
     container_name: e-commerce-frontend-container

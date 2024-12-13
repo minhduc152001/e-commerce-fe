@@ -7,14 +7,14 @@ import {
   InputNumber,
   Select,
 } from "antd";
-import React, { useState } from "react";
-import { formatPrice, formatShortNumber } from "../utils/format";
-import { addresses } from "../constants/addresses";
-import { TDistrict, TProductTier, TWard } from "../types/type";
-import { Option } from "antd/es/mentions";
 import TextArea from "antd/es/input/TextArea";
-import { TProduct } from "../constants/type";
+import { Option } from "antd/es/mentions";
+import React, { useState } from "react";
+import { addresses } from "../constants/addresses";
 import { EAttributeType } from "../constants/enum";
+import { TProduct } from "../constants/type";
+import { TDistrict, TProductTier, TWard } from "../types/type";
+import { formatPrice } from "../utils/format";
 
 type TProp = {
   product: TProduct;
