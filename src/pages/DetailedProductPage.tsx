@@ -460,7 +460,7 @@ const DetailedProductPage = () => {
           {/* <div className="text-sm">Xem thêm {">"}</div> */}
         </div>
         {/* Hiện số sao rating */}
-        {ratingCount && (
+        {ratingCount ? (
           <div className="flex gap-2 items-center mb-2">
             <div className="text-sm">
               {productRating}
@@ -470,6 +470,8 @@ const DetailedProductPage = () => {
               {generateStars(Number(productRating) || 0)}
             </div>
           </div>
+        ) : (
+          <></>
         )}
         {/* Reviews */}
         {displayingReviews?.map((el, i) => (
@@ -553,7 +555,7 @@ const DetailedProductPage = () => {
       </div>
 
       {/* Bảng kích cỡ (nếu có) */}
-      {sizeImageTableData && (
+      {sizeImageTableData?.length && (
         <div className="mb-6">
           <div className="font-bold">Bảng kích cỡ size</div>
           <Table
