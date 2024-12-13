@@ -1,19 +1,19 @@
-import { EyeFilled, HeartFilled, MinusOutlined } from "@ant-design/icons";
+import { EyeFilled, HeartFilled } from "@ant-design/icons";
 import { Avatar, Button, Carousel, Image, Table } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { formatPrice, formatShortNumber } from "../utils/format";
-import ImageFeedbackShow from "../components/ImageFeedbackShow";
-import CreateOrder from "../components/CreateOrder";
-import Footer from "../components/Footer";
-import { TProduct, TReview } from "../constants/type";
+import { toast } from "react-toastify";
 import {
   getProductAPI,
   listReviewsByProductAPI,
   listTiersByProductAPI,
 } from "../api/axios";
-import { toast } from "react-toastify";
+import CreateOrder from "../components/CreateOrder";
+import Footer from "../components/Footer";
+import ImageFeedbackShow from "../components/ImageFeedbackShow";
+import { TProduct, TReview } from "../constants/type";
 import { TProductTier } from "../types/type";
+import { formatPrice, formatShortNumber } from "../utils/format";
 import LoadingPage from "./LoadingPage";
 
 const DetailedProductPage = () => {

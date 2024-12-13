@@ -19,5 +19,7 @@ jobs:
           cd ./e-commerce-apps/frontend
           git pull origin main
           npm i
-          pm2 restart e-commerce-frontend
+          pm2 stop e-commerce-frontend
+          pm2 delete e-commerce-frontend
+          pm2 start "npm start" --name e-commerce-frontend
           EOF
