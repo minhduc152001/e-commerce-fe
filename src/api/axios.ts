@@ -3,7 +3,7 @@ import { TProduct, TReview } from "../constants/type";
 import { TProductTier } from "../types/type";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:6789",
+  baseURL: "http://15.235.167.234:6789",
   timeout: 90000,
   maxBodyLength: Infinity,
   headers: {
