@@ -16,5 +16,7 @@ jobs:
       - name: Deploy application
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 << 'EOF'
+          cd ./e-commerce-apps/frontend
+          npm i
           pm2 start "npm start" --name e-commerce-frontend
           EOF
