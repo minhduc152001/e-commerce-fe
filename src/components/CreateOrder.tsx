@@ -104,8 +104,6 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
       label: attr.name,
     }));
 
-  // const defaultSizes = product
-
   const onFinish = (values: FieldType) => {
     const bundles = form.getFieldValue("bundles");
     const sizes = form.getFieldValue("sizes");
@@ -141,7 +139,12 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
             </div>
           </div>
           <div className="text-xs w-[240px] text-wrap h-10 truncate">
-            {product.description}
+            {product.description?.split("\n").map((item, index) => (
+              <React.Fragment key={index}>
+                {item}
+                <br />
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </div>
@@ -326,7 +329,12 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
         ) : (
           <div>
             <Form.Item name="quantity" className="mb-1">
-              <InputNumber controls addonBefore="Số lượng:" addonAfter="sản phẩm" className=" w-full"/>
+              <InputNumber
+                controls
+                addonBefore="Số lượng:"
+                addonAfter="sản phẩm"
+                className=" w-full"
+              />
             </Form.Item>
           </div>
         )}

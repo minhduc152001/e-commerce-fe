@@ -1,23 +1,23 @@
 name: Deploy to Server
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Deploy application
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 "cd ./e-commerce-apps/frontend && docker-compose up --build -d"
+          ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 << 'EOF'
+          sudo docker pull minhduc152001/e-commerce-frontend:latest
+          sudo docker stop e-commerce-frontend-container || true
+          sudo docker rm e-commerce-frontend-container || true
+          sudo docker run -d --name e-commerce-frontend-container -p 12345:80 minhduc152001/e-commerce-frontend:latest
+          EOF

@@ -1,6 +1,6 @@
 import { EyeFilled, HeartFilled, MinusOutlined } from "@ant-design/icons";
 import { Avatar, Button, Carousel, Image, Table } from "antd";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { formatPrice, formatShortNumber } from "../utils/format";
 import ImageFeedbackShow from "../components/ImageFeedbackShow";
@@ -133,7 +133,7 @@ const DetailedProductPage = () => {
 
         const reviews = await listReviewsByProductAPI(id);
         setReviews(reviews);
-        setDisplayingReviews(reviews);
+        setDisplayingReviews(reviews.slice(0, 5));
 
         const tiers = await listTiersByProductAPI(id);
         setProductTiers(tiers);
@@ -310,7 +310,7 @@ const DetailedProductPage = () => {
       <div className="px-4 mt-1 mb-3">
         <div className="flex gap-2 justify-between items-center">
           <div className="font-quicksand text-base font-semibold">
-            {product.name.toUpperCase()}
+            {product.name?.toUpperCase()}
           </div>
           <img
             className="w-[26px] h-10"
@@ -457,7 +457,7 @@ const DetailedProductPage = () => {
           <div className="text-base font-bold mb-1">
             Đánh giá của khách hàng ({formatShortNumber(ratingCount)})
           </div>
-          <div className="text-sm">Xem thêm {">"}</div>
+          {/* <div className="text-sm">Xem thêm {">"}</div> */}
         </div>
         {/* Hiện số sao rating */}
         {ratingCount && (
@@ -537,7 +537,14 @@ const DetailedProductPage = () => {
         flex flex-col gap-3
         "
       >
-        <div>{product.description}</div>
+        <div>
+          {product.description?.split("\n").map((item, index) => (
+            <React.Fragment key={index}>
+              {item}
+              <br />
+            </React.Fragment>
+          ))}
+        </div>
         <Image.PreviewGroup>
           {productImages.map((el) => (
             <Image preview={false} src={el} />
