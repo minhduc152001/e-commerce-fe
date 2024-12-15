@@ -15,6 +15,9 @@ import { TProduct, TReview } from "../constants/type";
 import { TProductTier } from "../types/type";
 import { formatPrice, formatShortNumber } from "../utils/format";
 import LoadingPage from "./LoadingPage";
+import { getRandomElement } from "../utils/random";
+import { fakeViewCount } from "../fakeData/randomNumber";
+import { calcNetPrice } from "../utils/calc";
 
 const DetailedProductPage = () => {
   const { id } = useParams();
@@ -34,10 +37,9 @@ const DetailedProductPage = () => {
     (currentSaleEndTime - Date.now()) / 1000
   );
   const [visibleProductImage, setVisibleProductImage] = useState(false);
-  const randomNumbers = [768, 819, 810, 799, 789, 801, 796];
-  const [watchingPeopleCount, setWatchingPeopleCount] = useState<number>(
-    randomNumbers[0]
-  );
+  const randomNumber = getRandomElement(fakeViewCount);
+  const [watchingPeopleCount, setWatchingPeopleCount] =
+    useState<number>(randomNumber);
 
   // const shopSectionRef = useRef<HTMLDivElement>(null);
   const feedbackSectionRef = useRef<HTMLDivElement>(null);
@@ -146,10 +148,9 @@ const DetailedProductPage = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const newRandomNumber =
-        randomNumbers[Math.floor(Math.random() * randomNumbers.length)];
+      const newRandomNumber = getRandomElement(fakeViewCount);
       setWatchingPeopleCount(newRandomNumber);
-    }, 2000);
+    }, 1500);
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
@@ -227,7 +228,7 @@ const DetailedProductPage = () => {
 
           <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
             {formatPrice(
-              (product.price * (100 - product.discountPercentage)) / 100
+              calcNetPrice(product.price, product.discountPercentage)
             )}
           </div>
 
@@ -504,7 +505,7 @@ const DetailedProductPage = () => {
         {/* Đánh giá của khách hàng dành cho cửa hàng */}
         <div className="text-[15px] font-bold text-center my-2">
           Đánh giá của khách hàng dành cho cửa hàng (
-          {formatShortNumber(Number(productRating) || 0)})
+          {formatShortNumber(Number(reviews?.length) || 0)})
         </div>
         <div className="flex justify-between px-2">
           {reviews &&

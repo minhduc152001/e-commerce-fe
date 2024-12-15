@@ -1,3 +1,4 @@
+import { ArrowLeftOutlined, CheckOutlined } from "@ant-design/icons";
 import {
   Button,
   Checkbox,
@@ -5,15 +6,19 @@ import {
   Image,
   Input,
   InputNumber,
+  Modal,
   Select,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { Option } from "antd/es/mentions";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { createOrder } from "../api/axios";
 import { addresses } from "../constants/addresses";
 import { EAttributeType } from "../constants/enum";
 import { TProduct } from "../constants/type";
 import { TDistrict, TProductTier, TWard } from "../types/type";
+import { calcNetPrice } from "../utils/calc";
 import { formatPrice } from "../utils/format";
 
 type TProp = {
@@ -28,9 +33,9 @@ type TProp = {
 };
 
 type FieldType = {
-  bundles: string[];
-  phone: string | null;
-  receiverName: string | null;
+  tiers: string[];
+  phoneNumber: string | null;
+  customerName: string | null;
   city: string | null;
   district: string | null;
   ward: string | null;
@@ -51,6 +56,9 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
   const [errorChooseSize, setErrorChooseSize] = useState(false);
   const [errorChooseCode, setErrorChooseCode] = useState(false);
   const [errorChooseColor, setErrorChooseColor] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isConfirmOrderModalOpen, setIsConfirmOrderModalOpen] = useState(false);
+  const [isThankOrderModalOpen, setIsThankOrderModalOpen] = useState(false);
 
   const handleCityChange = (cityName: string) => {
     const selectedCity = addresses.find((city) => city.Name === cityName);
@@ -71,11 +79,11 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
   }));
 
   const initialValues: FieldType = {
-    bundles: [],
+    tiers: [],
     city: null,
     district: null,
-    phone: null,
-    receiverName: null,
+    phoneNumber: null,
+    customerName: null,
     detailAddress: null,
     ward: null,
     sizes: [],
@@ -104,15 +112,51 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
       label: attr.name,
     }));
 
-  const onFinish = (values: FieldType) => {
-    const bundles = form.getFieldValue("bundles");
+  const showModal = () => {
+    setIsConfirmOrderModalOpen(true);
+  };
+
+  const handleClickConfirm = () => {
+    setIsConfirmOrderModalOpen(false);
+    setIsThankOrderModalOpen(true);
+    form.resetFields();
+  };
+
+  const handleCancel = () => {
+    setIsConfirmOrderModalOpen(false);
+  };
+
+  const onFinish = async (values: FieldType) => {
+    const tiers = form.getFieldValue("tiers");
     const sizes = form.getFieldValue("sizes");
     const codes = form.getFieldValue("codes");
     const colors = form.getFieldValue("colors");
 
-    values = { ...values, bundles, sizes, codes, colors };
+    try {
+      values = { ...values, tiers, sizes, codes, colors };
+      const shippingAddress = `${values.detailAddress}, ${values.ward}, ${values.district}, ${values.city}`;
 
-    console.log("values:", values);
+      setLoading(true);
+      await createOrder({
+        productId: product.id,
+        customerName: String(values.customerName),
+        phoneNumber: String(values.phoneNumber),
+        shippingAddress,
+        tiers: tiers,
+        sizes: sizes,
+        codes: codes,
+        colors: colors,
+        note: values.note || "",
+        quantity: values.quantity || null,
+      });
+      setLoading(false);
+
+      // Create modal confirm
+      showModal();
+    } catch (error) {
+      toast.error("Vui lòng kiểm tra lại thông tin!");
+      setLoading(false);
+    }
   };
 
   return (
@@ -165,7 +209,7 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           <div className="flex gap-1">
             <div className="text-[rgb(233,9,9)] animate-pulse text-lg">
               {formatPrice(
-                (product.price * (100 - product.discountPercentage)) / 100,
+                calcNetPrice(product.price, product.discountPercentage),
                 "VND"
               )}{" "}
             </div>
@@ -212,7 +256,7 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           {/* Name */}
           <Form.Item<FieldType>
             className="mb-1 w-full"
-            name="receiverName"
+            name="customerName"
             rules={[{ required: true, message: "Vui lòng nhập tên" }]}
           >
             <Input className="h-10 text-[13px]" placeholder="Họ và tên" />
@@ -220,7 +264,7 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           {/* Phone number */}
           <Form.Item<FieldType>
             className="mb-1 w-full"
-            name="phone"
+            name="phoneNumber"
             rules={[{ required: true, message: "Vui lòng nhập số điện thoại" }]}
           >
             <Input className="h-10 text-[13px]" placeholder="Số điện thoại" />
@@ -308,7 +352,7 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
                 className="flex flex-col gap-2"
                 onChange={(el) => {
                   setErrorBundle(false);
-                  form.setFieldValue("bundles", el);
+                  form.setFieldValue("tiers", el);
                 }}
               >
                 {bundleOptions.map((el, i) => (
@@ -445,6 +489,7 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           color="danger"
           variant="solid"
           htmlType="submit"
+          loading={loading}
         >
           ĐẶT HÀNG
         </Button>
@@ -457,6 +502,114 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
         <img src="../../assets/svg/greenTick.svg" className="w-4 h-4" alt="" />
         <div className="">Hỗ trợ đổi size khi không vừa rộng hoặc lỗi</div>
       </div>
+      {/* Confirm order modal */}
+      <Modal
+        title={
+          <div className="font-gilroy mx-3 text-center">
+            <Image
+              width={40}
+              height={40}
+              src="https://media.istockphoto.com/id/1367070716/vector/tick-mark-approved-with-shield-icon.jpg?s=612x612&w=0&k=20&c=sux2h6v_lKNQIj5Ump9lGo2PRKUdP4h2ppuFOQj95NA="
+            />
+            <div className="text-2xl text-neutral-700">
+              Cảm Ơn Bạn Đã Đặt Hàng!
+            </div>
+            <div className="mt-3 mx-4 font-normal">
+              Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất!
+            </div>
+          </div>
+        }
+        className="w-full"
+        closeIcon={false}
+        open={isConfirmOrderModalOpen}
+        onOk={handleClickConfirm}
+        onCancel={handleCancel}
+        footer={
+          <div className="mt-6">
+            <div className="flex justify-between">
+              <Button
+                onClick={handleCancel}
+                icon={<ArrowLeftOutlined />}
+                color="danger"
+                danger
+                type="primary"
+                className="h-14 font-semibold w-40"
+              >
+                <div>
+                  Sai thông tin
+                  <br />
+                  Đặt hàng lại
+                </div>
+              </Button>
+              <Button
+                onClick={handleClickConfirm}
+                type="primary"
+                color="primary"
+                className="h-14 font-semibold w-40"
+                iconPosition="end"
+                icon={<CheckOutlined />}
+              >
+                Xác nhận
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <div className="mt-6 border-2 solid border-neutral-700 p-4 text-base font-gilroy">
+          <div className="font-bold">Thông tin đặt hàng</div>
+          <div className="pl-3">
+            <div className="">
+              <span>Họ tên:</span>
+              <span className="font-bold ml-16">
+                {form.getFieldValue("customerName")}
+              </span>
+            </div>
+            <div className="">
+              <span>Số điện thoại:</span>
+              <span className="font-bold ml-[18px]">
+                {form.getFieldValue("phoneNumber")}
+              </span>
+            </div>
+            <div className="">
+              <span>Địa chỉ:</span>
+              <span className="font-bold ml-2">{`${form.getFieldValue(
+                "detailAddress"
+              )}, ${form.getFieldValue("ward")}, ${form.getFieldValue(
+                "district"
+              )}, ${form.getFieldValue("city")}`}</span>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      {/* Modal thanks for order */}
+      <Modal
+        title={
+          <div className="text-center text-lg">Cảm ơn bạn đã đặt hàng</div>
+        }
+        className="w-full"
+        open={isThankOrderModalOpen}
+        onCancel={() => setIsThankOrderModalOpen(false)}
+        footer={<></>}
+      >
+        <div className="flex flex-col items-center">
+          <Image
+            width={220}
+            src="https://i.pinimg.com/originals/8a/a4/85/8aa485ec51c09b7970a9f80b12795a28.gif"
+          />
+          <Image
+            height={80}
+            src="https://t3.ftcdn.net/jpg/02/91/52/22/360_F_291522205_XkrmS421FjSGTMRdTrqFZPxDY19VxpmL.jpg"
+          />
+          <div className="font-semibold">
+            CHÚNG TÔI ĐÃ NHẬN ĐƯỢC ĐƠN HÀNG CỦA BẠN
+          </div>
+          <div className="text-center mt-4 mb-1">
+            Nhân viên của shop sẽ gọi điện lại để xác nhận đơn hàng trong thời
+            gian làm việc hàng ngày.
+          </div>
+        </div>
+      </Modal>
+      ;
     </div>
   );
 }

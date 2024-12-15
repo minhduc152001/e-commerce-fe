@@ -4,6 +4,7 @@ import { TProduct } from "../constants/type";
 import { listProductsAPI } from "../api/axios";
 import { toast } from "react-toastify";
 import { formatPrice } from "../utils/format";
+import { calcNetPrice } from "../utils/calc";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const HomePage = () => {
                 </div>
                 <div className="font-bold text-yellow-500">
                   {formatPrice(
-                    (product.price * (100 - product.discountPercentage)) / 100
+                    calcNetPrice(product.price, product.discountPercentage)
                   )}
                 </div>
               </div>

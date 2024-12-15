@@ -33,13 +33,16 @@ const AppLayout: React.FC = () => {
           label: "Quản lý Mua combo",
           path: "/manage-product-tiers",
         },
+        {
+          key: "manage-orders",
+          label: "Đơn hàng",
+          path: "/manage-orders",
+        },
+        { key: "logout", label: "Đăng xuất", action: handleLogout },
       ]
     : [];
 
-  const menuItems = [
-    { key: "orders", label: "Đơn hàng", path: "/don-hang" },
-    { key: "logout", label: "Đăng xuất", action: handleLogout },
-  ].concat(menuItemsAdmin);
+  const menuItems = menuItemsAdmin;
 
   const handleMenuClick = ({ key }: { key: string }) => {
     const menuItem = menuItems.find((item) => item.key === key);

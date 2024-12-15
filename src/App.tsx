@@ -48,9 +48,9 @@ const App = () => {
               {/* Routes With Navbar */}
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<HomePage />} />
-                <Route path="/gio-hang" element={<CartPage />} />
+                {/* <Route path="/gio-hang" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/don-hang" element={<ListOrderPage />} />
+                <Route path="/don-hang" element={<ListOrderPage />} /> */}
 
                 {/* ADMIN-Only Routes */}
                 {userRole === "ADMIN" && (
@@ -64,6 +64,10 @@ const App = () => {
                     <Route
                       path="/manage-product-tiers"
                       element={<ProductTierPage />}
+                    />
+                    <Route
+                      path="/manage-orders"
+                      element={<ListOrderPage />}
                     />
                   </>
                 )}
