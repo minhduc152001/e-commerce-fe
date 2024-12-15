@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { EAttributeType } from "../constants/enum";
 import { TOrder, TProductTier, TSize } from "../types/type";
 import { TAttribute } from "../constants/type";
+import { formatPrice } from "../utils/format";
 
 const { Option } = Select;
 
@@ -119,16 +120,23 @@ const ListOrderPage = () => {
       title: "Địa chỉ nhận hàng",
       dataIndex: "shippingAddress",
       key: "shippingAddress",
+      render: (addr: string) => (
+        <div className="max-w-96 truncate text-wrap">{addr}</div>
+      ),
     },
     {
       title: "Giá đơn hàng (chưa có ship)",
       dataIndex: "totalPrice",
       key: "totalPrice",
+      render: (price: number) => formatPrice(price),
     },
     {
       title: "Số lượng",
       dataIndex: "quantity",
       key: "quantity",
+      render: (quantity: number) => (
+        <div className="text-center">{quantity}</div>
+      ),
     },
     {
       title: "Thời gian tạo",
@@ -146,7 +154,7 @@ const ListOrderPage = () => {
       render: (_: undefined, record: any) => {
         return (
           <Button type="link" onClick={() => handleEditClick(record)}>
-            Edit
+            Sửa
           </Button>
         );
       },
