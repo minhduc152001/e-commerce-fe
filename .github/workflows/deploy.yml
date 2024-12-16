@@ -7,20 +7,39 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Use the Node.js version that matches your project
+
+      # Step 3: Install dependencies and build
+      - name: Install dependencies and build
+        run: |
+          npm install --production
+          npm run build
+
+      # Step 4: Set up SSH
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Deploy application
+
+      # Step 5: Copy build folder to the server
+      - name: Copy build folder to server
+        run: |
+          scp -o StrictHostKeyChecking=no -r ./build ubuntu@15.235.167.234:./e-commerce-apps/frontend
+
+      # Step 6: Restart the app using PM2
+      - name: Restart application
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 << 'EOF'
           cd ./e-commerce-apps/frontend
-          git pull origin main
-          npm i
-          pm2 stop e-commerce-frontend
-          pm2 delete e-commerce-frontend
-          npm run build
+          pm2 stop e-commerce-frontend || true
+          pm2 delete e-commerce-frontend || true
           pm2 start "npm run serve" --name e-commerce-frontend
           EOF
