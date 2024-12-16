@@ -1,25 +1,23 @@
 import {
+  Navigate,
   Route,
   BrowserRouter as Router,
   Routes,
-  Navigate,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import CartPage from "./pages/CartPage";
-import CheckoutPage from "./pages/CheckoutPage";
+import AppLayout from "./layout/AppLayout";
 import CreateProduct from "./pages/CreateProduct";
+import CreateReview from "./pages/CreateReview";
 import DetailedProductPage from "./pages/DetailedProductPage";
 import HomePage from "./pages/HomePage";
-import NotFound from "./pages/NotFound";
 import ListOrderPage from "./pages/ListOrderPage";
+import ListProductsPage from "./pages/ListProductsPage";
+import NotFound from "./pages/NotFound";
+import ProductTierPage from "./pages/ProductTierPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
-import CreateReview from "./pages/CreateReview";
-import AppLayout from "./layout/AppLayout"; // Layout with navbar
-import ListProductsPage from "./pages/ListProductsPage";
-import ProductTierPage from "./pages/ProductTierPage";
 
 const App = () => {
   const isLoggedIn = !!localStorage.getItem("token");
@@ -65,10 +63,7 @@ const App = () => {
                       path="/manage-product-tiers"
                       element={<ProductTierPage />}
                     />
-                    <Route
-                      path="/manage-orders"
-                      element={<ListOrderPage />}
-                    />
+                    <Route path="/manage-orders" element={<ListOrderPage />} />
                   </>
                 )}
               </Route>

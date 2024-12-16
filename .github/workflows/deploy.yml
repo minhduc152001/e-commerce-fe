@@ -21,5 +21,6 @@ jobs:
           npm i
           pm2 stop e-commerce-frontend
           pm2 delete e-commerce-frontend
-          pm2 start "npm start" --name e-commerce-frontend
+          npm run build
+          pm2 start "npm run serve" --name e-commerce-frontend
           EOF

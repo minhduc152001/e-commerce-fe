@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Select, message } from "antd";
+import { Button, Form, Input, Modal, Select, Table } from "antd";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   fetchOrders,
   getProductAPI,
   listTiersByProductAPI,
   updateOrder,
 } from "../api/axios";
-import { toast } from "react-toastify";
 import { EAttributeType } from "../constants/enum";
-import { TOrder, TProductTier, TSize } from "../types/type";
 import { TAttribute } from "../constants/type";
+import { TOrder, TProductTier, TSize } from "../types/type";
 import { formatPrice } from "../utils/format";
 
 const { Option } = Select;
@@ -56,7 +56,7 @@ const ListOrderPage = () => {
       const data = await fetchOrders();
       setOrders(data);
     } catch (error) {
-      message.error("Failed to load orders");
+      toast.error("Có lỗi khi tải dữ liệu, thử lại!");
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ const ListOrderPage = () => {
       const options = await fetchDropdownOptions(productId);
       setDropdownOptions(options);
     } catch (error) {
-      message.error("Failed to load dropdown options");
+      toast.error("Lỗi khi tải dữ liệu, thử lại!");
     }
   };
 
