@@ -15,7 +15,7 @@ import { TProduct, TReview } from "../constants/type";
 import { TProductTier } from "../types/type";
 import { formatPrice, formatShortNumber } from "../utils/format";
 import LoadingPage from "./LoadingPage";
-import { getRandomElement } from "../utils/random";
+import { generateRandomNumber, getRandomElement } from "../utils/random";
 import { fakeViewCount } from "../fakeData/randomNumber";
 import { calcNetPrice } from "../utils/calc";
 
@@ -27,8 +27,12 @@ const DetailedProductPage = () => {
   const [productTiers, setProductTiers] = useState<TProductTier[]>();
 
   let currentSaleEndTime = Number(localStorage.getItem("saleEndTime")) || null;
-  const nextSaleEndTime = Date.now() + (2 * 60 * 60 + 15 * 60) * 1000; // 2 hours & 36 minutes for flash sale
-  if (!currentSaleEndTime || currentSaleEndTime < Date.now()) {
+  const nextSaleEndTime = Date.now() + (2 * 60 * 60 + 40 * 60) * 1000; // 2 hours & 36 minutes for flash sale
+  if (
+    !currentSaleEndTime ||
+    // always set times from 2h20m to 2h40m
+    currentSaleEndTime < Date.now() + (2 * 60 * 60 + 20 * 60) * 1000
+  ) {
     localStorage.setItem("saleEndTime", nextSaleEndTime.toString());
     currentSaleEndTime = nextSaleEndTime;
   }
@@ -37,9 +41,12 @@ const DetailedProductPage = () => {
     (currentSaleEndTime - Date.now()) / 1000
   );
   const [visibleProductImage, setVisibleProductImage] = useState(false);
-  const randomNumber = getRandomElement(fakeViewCount);
+  // Random
+  const [randomSoldCount, setRandomSoldCount] = useState<number>(0);
+  const [feedbackCount, setFeedbackCount] = useState(0);
+  const randomViews = getRandomElement(fakeViewCount);
   const [watchingPeopleCount, setWatchingPeopleCount] =
-    useState<number>(randomNumber);
+    useState<number>(randomViews);
 
   // const shopSectionRef = useRef<HTMLDivElement>(null);
   const feedbackSectionRef = useRef<HTMLDivElement>(null);
@@ -139,6 +146,9 @@ const DetailedProductPage = () => {
 
         const tiers = await listTiersByProductAPI(id);
         setProductTiers(tiers);
+
+        setRandomSoldCount(generateRandomNumber(4000, 8000));
+        setFeedbackCount(generateRandomNumber(1000, 1500));
       } catch (error) {
         toast.error("Có lỗi xảy ra. Hãy thử lại");
       }
@@ -376,7 +386,7 @@ const DetailedProductPage = () => {
             </div>
 
             {/* text FLASH SALE */}
-            <div className="relative w-fit h-[25.5px] left-[175px] !sm:left-[101px] top-[3px]">
+            <div className="relative w-fit h-[25.5px] left-[162px] top-[3px]">
               <div className="text-white text-[17px] font-bold text-left">
                 FLASH SALE
               </div>
@@ -608,12 +618,14 @@ const DetailedProductPage = () => {
               </>
             )}
             <span className="ml-1 text-[rgb(15,195,193)]">
-              ({formatShortNumber(ratingCount)})
+              ({formatShortNumber(feedbackCount)})
             </span>
 
             <span className="ml-6 font-bold">|</span>
             <span className="ml-2">Đã bán</span>
-            <span className="ml-1 font-bold">{formatShortNumber(7200)}</span>
+            <span className="ml-1 font-bold">
+              {formatShortNumber(randomSoldCount)}
+            </span>
           </div>
         </div>
       </div>
@@ -738,7 +750,7 @@ const DetailedProductPage = () => {
           className="py-0.5 flex items-center justify-between"
         >
           <div className="text-base font-bold mb-1">
-            Đánh giá của khách hàng ({formatShortNumber(ratingCount)})
+            Đánh giá của khách hàng ({formatShortNumber(feedbackCount)})
           </div>
           {/* <div className="text-sm">Xem thêm {">"}</div> */}
         </div>
@@ -787,11 +799,11 @@ const DetailedProductPage = () => {
         {/* Đánh giá của khách hàng dành cho cửa hàng */}
         <div className="text-[15px] font-bold text-center my-2">
           Đánh giá của khách hàng dành cho cửa hàng (
-          {formatShortNumber(Number(reviews?.length) || 0)})
+          {formatShortNumber(feedbackCount)})
         </div>
-        <div className="flex justify-between px-2">
+        <div className="flex justify-between px-2 gap-1">
           {reviews &&
-            [5, 4, 3, 2, 1].map((rating) => (
+            [5, 4, 3, 2, 1].map((rating, i) => (
               <div
                 className="flex gap-1 border border-[rgba(45,45,45,1)] rounded-lg p-1 cursor-pointer"
                 onClick={() =>
@@ -807,7 +819,9 @@ const DetailedProductPage = () => {
                 <div>
                   (
                   {formatShortNumber(
-                    reviews.filter((el) => el.rating === rating).length
+                    i === 0
+                      ? feedbackCount
+                      : reviews.filter((el) => el.rating === rating).length
                   )}
                   )
                 </div>
@@ -823,6 +837,7 @@ const DetailedProductPage = () => {
         "
       >
         <div className="mx-3">
+          <div className="font-bold">THÔNG TIN SẢN PHẨM</div>
           <div className="text-justify">
             {product.description?.split("\n").map((item, index) => (
               <React.Fragment key={index}>
