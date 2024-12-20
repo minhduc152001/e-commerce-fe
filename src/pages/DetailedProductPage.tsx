@@ -621,16 +621,20 @@ const DetailedProductPage = () => {
       {/* Sản phẩm hàng đầu - Thời trang nữ bán chạy */}
       <div
         // ref={shopSectionRef}
-        className="flex text-sm items-center bg-[rgba(255,242,231,1)] h-10 px-4 text-[rgba(172,91,40,1)]"
+        className="flex text-sm justify-between items-center bg-[rgba(255,242,231,1)] h-10 px-4 text-[rgba(172,91,40,1)]"
       >
-        <img
-          className="w-7 h-7"
-          src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/champion-img.webp"
-          alt=""
-        />
-        <div className="ml-3 font-bold">Sản phẩm hàng đầu</div>
-        <HeartFilled className="ml-4" />
-        <div className="ml-6">Thời trang nữ bán chạy</div>
+        <div className="flex justify-between items-center gap-1.5">
+          <img
+            className="w-7 h-7"
+            src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/champion-img.webp"
+            alt=""
+          />
+          <div className="font-bold">Sản phẩm hàng đầu</div>
+        </div>
+        <div className="flex justify-between items-center gap-1.5">
+          <HeartFilled />
+          <div>Thời trang nữ bán chạy</div>
+        </div>
       </div>
 
       {/* Thanh toán bảo mật - Đổi trả dễ dàng - Chính hãng 100% */}
