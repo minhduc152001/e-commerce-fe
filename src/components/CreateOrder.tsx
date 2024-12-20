@@ -30,6 +30,7 @@ type TProp = {
     minutes: string;
     seconds: string;
   };
+  screenWidth: number;
 };
 
 type FieldType = {
@@ -47,7 +48,13 @@ type FieldType = {
   quantity: number;
 };
 
-function CreateOrder({ product, time, productImages, tiers }: TProp) {
+function CreateOrder({
+  screenWidth,
+  product,
+  time,
+  productImages,
+  tiers,
+}: TProp) {
   const [form] = Form.useForm<FieldType>();
 
   const [districts, setDistricts] = useState<TDistrict[]>([]);
@@ -161,16 +168,22 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
 
   return (
     <div>
-      <div className="flex mx-3 gap-5">
-        <Image
-          preview={false}
-          src={productImages[0]}
-          width={115}
-          height={115}
-        />
+      <div className="flex mx-3 gap-5 justify-center">
+        {/* {screenWidth > 375 && (
+          <Image
+            preview={false}
+            src={productImages[0]}
+            width={screenWidth*0.33}
+            height={screenWidth*0.33}
+          />
+        )} */}
 
-        <div className="flex flex-col text-center">
-          <div className="flex justify-between w-[260px] h-20 items-center">
+        <div
+          className={`flex flex-col text-center w-[${
+            screenWidth > 375 ? "66%" : "100%"
+          }]`}
+        >
+          <div className="flex justify-between h-20 items-center">
             <Button
               className="w-[52px] h-[26px] font-bold !bg-[rgba(233,9,9,1)] border shadow-[0px_4px_4px_rgba(0,0,0,0.25)] rounded-md border-solid"
               color="danger"
@@ -178,11 +191,11 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
             >
               Mall
             </Button>
-            <div className="text-sm font-bold w-[200px] text-wrap h-10 truncate">
+            <div className="text-sm font-bold text-wrap h-10 truncate">
               {product.name}
             </div>
           </div>
-          <div className="text-xs w-[240px] text-wrap h-10 truncate">
+          <div className="text-xs text-wrap h-10 truncate ">
             {product.description?.split("\n").map((item, index) => (
               <React.Fragment key={index}>
                 {item}
@@ -192,7 +205,7 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-10 ml-1">
+      <div className="flex items-center justify-between ml-1">
         <div className="text-sm">Vận chuyển từ Hà Nội</div>
         <div className="flex items-center gap-3">
           <div className="text-[15px] line-through">
@@ -238,13 +251,13 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           <div>Giây</div>
         </div>
       </div>
-      <div className="flex gap-2 my-3 items-center font-bold justify-center">
+      <div className="flex gap-2 my-3 items-center font-bold justify-center mx-1">
         <img
           className="w-[22px] h-[22px]"
-          src="https://content.pancake.vn/1/s422x422/fwebp/1d/26/f2/e0/c08ebf508b9ce8e3b885e1b4753a41c48be72369f05ebeee96ffcc2f.png"
+          src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/tag-sale.webp"
           alt="tag"
         />
-        <div>ĐẶT HÀNG NGÀY ĐỂ NHẬN ƯU ĐÃI TỪ SHOP</div>
+        <div className="text-justify">ĐẶT HÀNG NGAY ĐỂ NHẬN ƯU ĐÃI TỪ SHOP</div>
       </div>
       <Form
         form={form}
@@ -494,13 +507,17 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           ĐẶT HÀNG
         </Button>
       </Form>
-      <div className="flex items-center justify-center gap-3 mt-3 mb-1">
+      <div className="flex items-center justify-center gap-3 mt-3 mb-1 mx-1">
         <img src="../../assets/svg/greenTick.svg" className="w-4 h-4" alt="" />
-        <div className="">Được kiểm tra hàng trước khi thanh toán</div>
+        <div className="text-justify">
+          Được kiểm tra hàng trước khi thanh toán
+        </div>
       </div>
-      <div className="flex items-center justify-center gap-3 mb-3">
+      <div className="flex items-center justify-center gap-3 mb-3 mx-1">
         <img src="../../assets/svg/greenTick.svg" className="w-4 h-4" alt="" />
-        <div className="">Hỗ trợ đổi size khi không vừa rộng hoặc lỗi</div>
+        <div className="text-justify">
+          Hỗ trợ đổi size khi không vừa rộng hoặc lỗi
+        </div>
       </div>
       {/* Confirm order modal */}
       <Modal
@@ -609,7 +626,6 @@ function CreateOrder({ product, time, productImages, tiers }: TProp) {
           </div>
         </div>
       </Modal>
-      ;
     </div>
   );
 }

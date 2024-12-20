@@ -188,12 +188,23 @@ const DetailedProductPage = () => {
   };
   const time = formatTime(timeLeft);
 
+  const innerWidth = window.innerWidth <= 440 ? window.innerWidth : 440;
+  const [screenWidth, setScreenWidth] = useState(innerWidth);
+  useEffect(() => {
+    const handleResize = () =>
+      setScreenWidth(window.innerWidth <= 440 ? window.innerWidth : 440);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (!product) return <LoadingPage />;
 
   const productImages = [];
   const mainProductImage = product.productImage;
   mainProductImage && productImages.push(mainProductImage);
   productImages.push(...(product.attributes?.map((attr) => attr.image) || []));
+
+  const buyButtonWidthClass = screenWidth < 390 ? "w-24" : "w-28";
 
   return (
     <div className="mx-auto">
@@ -206,9 +217,10 @@ const DetailedProductPage = () => {
                 key={index}
                 src={img}
                 alt={`Product Thumbnail ${index + 1}`}
-                width={420}
-                height={457}
+                width={screenWidth}
+                height={screenWidth}
                 preview={false}
+                style={{ objectFit: "none" }}
               />
             ))}
           </Carousel>
@@ -216,70 +228,336 @@ const DetailedProductPage = () => {
       </div>
 
       {/* Flash sale */}
-      <div className="bg-flash-sale h-[61px] text-white">
-        <div className="flex">
-          <div className="top-[6px] left-[17px] w-6 h-[26px] relative coupon-transform">
-            <img
-              className="w-full h-full"
-              src="../../assets/svg/coupon.svg"
-              alt=""
-            />
+      {screenWidth >= 440 ? (
+        <div className="bg-flash-sale h-[61px] text-white">
+          <div className="flex">
+            <div className="top-[6px] left-[17px] w-6 h-[26px] relative coupon-transform">
+              <img
+                className="w-full h-full"
+                src="../../assets/svg/coupon.svg"
+                alt=""
+              />
+            </div>
+
+            <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
+              {formatPrice(
+                calcNetPrice(product.price, product.discountPercentage)
+              )}
+            </div>
+
+            {/* text FLASH SALE */}
+            <div className="relative w-fit h-[25.5px] left-48 !sm:left-[101px] top-[3px]">
+              <div className="text-white text-[17px] font-bold text-left">
+                FLASH SALE
+              </div>
+            </div>
           </div>
 
-          <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
-            {formatPrice(
-              calcNetPrice(product.price, product.discountPercentage)
-            )}
-          </div>
+          <div className="flex">
+            {/* Initial price */}
+            <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
+              <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
+                <div className="bg-[rgb(196,188,188)]">
+                  {formatPrice(product.price)}
+                </div>
+              </div>
+            </div>
 
-          {/* text FLASH SALE */}
-          <div className="relative w-[123px] h-[25.5px] left-[175px] top-[3px]">
-            <div className="text-white text-[17px] font-bold text-left">
-              FLASH SALE
+            {/* How much percentage that saves */}
+            <div className="relative w-[130px] h-[19.5px] left-[20px] top-[5px]">
+              <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
+                Tiết kiệm tới {"  " + product.discountPercentage}%
+              </div>
+            </div>
+
+            {/* Kết thúc sau */}
+            <div className="relative h-[19.5px] left-9 top-[5px]">
+              <div className="text-[rgba(255,243,243,1)] text-[13px] font-bold text-left">
+                Kết thúc sau
+              </div>
+            </div>
+
+            {/* Time countdown */}
+            <div className="relative h-[19.5px] left-12 bottom-[4px]">
+              <div className="text-[20px] pointer-events-none flex gap-2">
+                <div className="countdown-item">
+                  <div>{time.hours}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.minutes}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.seconds}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      ) : screenWidth >= 412 ? (
+        <div className="bg-flash-sale h-[61px] text-white">
+          <div className="flex">
+            <div className="top-[6px] left-[17px] w-6 h-[26px] relative coupon-transform">
+              <img
+                className="w-full h-full"
+                src="../../assets/svg/coupon.svg"
+                alt=""
+              />
+            </div>
 
-        <div className="flex">
-          {/* Initial price */}
-          <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
-            <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
-              <div className="bg-[rgb(196,188,188)]">
-                {formatPrice(product.price)}
+            <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
+              {formatPrice(
+                calcNetPrice(product.price, product.discountPercentage)
+              )}
+            </div>
+
+            {/* text FLASH SALE */}
+            <div className="relative w-fit h-[25.5px] left-[175px] !sm:left-[101px] top-[3px]">
+              <div className="text-white text-[17px] font-bold text-left">
+                FLASH SALE
               </div>
             </div>
           </div>
 
-          {/* How much percentage that saves */}
-          <div className="relative w-[130px] h-[19.5px] left-[20px] top-[5px]">
-            <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
-              Tiết kiệm tới {"  " + product.discountPercentage}%
-            </div>
-          </div>
-
-          {/* Kết thúc sau */}
-          <div className="relative h-[19.5px] left-7 top-[5px]">
-            <div className="text-[rgba(255,243,243,1)] text-[13px] font-bold text-left">
-              Kết thúc sau
-            </div>
-          </div>
-
-          {/* Time countdown */}
-          <div className="relative h-[19.5px] left-[40px] bottom-[4px]">
-            <div className="text-[20px] pointer-events-none flex gap-2">
-              <div className="countdown-item">
-                <div>{time.hours}</div>
+          <div className="flex">
+            {/* Initial price */}
+            <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
+              <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
+                <div className="bg-[rgb(196,188,188)]">
+                  {formatPrice(product.price)}
+                </div>
               </div>
-              <div className="countdown-item">
-                <div>{time.minutes}</div>
+            </div>
+
+            {/* How much percentage that saves */}
+            <div className="relative w-[112px] h-[19.5px] left-[20px] top-[5px]">
+              <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
+                Tiết kiệm tới {"  " + product.discountPercentage}%
               </div>
-              <div className="countdown-item">
-                <div>{time.seconds}</div>
+            </div>
+
+            {/* Kết thúc sau */}
+            <div className="relative h-[19.5px] left-7 top-[5px]">
+              <div className="text-[rgba(255,243,243,1)] text-[13px] font-bold text-left">
+                Kết thúc sau
+              </div>
+            </div>
+
+            {/* Time countdown */}
+            <div className="relative h-[19.5px] left-[40px] bottom-[4px]">
+              <div className="text-[20px] pointer-events-none flex gap-2">
+                <div className="countdown-item">
+                  <div>{time.hours}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.minutes}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.seconds}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : screenWidth >= 390 ? (
+        <div className="bg-flash-sale h-[61px] text-white">
+          <div className="flex">
+            <div className="top-[6px] left-[17px] w-6 h-[26px] relative coupon-transform">
+              <img
+                className="w-full h-full"
+                src="../../assets/svg/coupon.svg"
+                alt=""
+              />
+            </div>
+
+            <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
+              {formatPrice(
+                calcNetPrice(product.price, product.discountPercentage)
+              )}
+            </div>
+
+            {/* text FLASH SALE */}
+            <div className="relative w-fit h-[25.5px] left-[175px] !sm:left-[101px] top-[3px]">
+              <div className="text-white text-[17px] font-bold text-left">
+                FLASH SALE
+              </div>
+            </div>
+          </div>
+
+          <div className="flex">
+            {/* Initial price */}
+            <div className="relative w-16 h-[21px] left-2.5 top-[5px]">
+              <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
+                <div className="bg-[rgb(196,188,188)]">
+                  {formatPrice(product.price)}
+                </div>
+              </div>
+            </div>
+
+            {/* How much percentage that saves */}
+            <div className="relative w-[110px] h-[19.5px] left-2.5 top-[5px]">
+              <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
+                Tiết kiệm tới {"  " + product.discountPercentage}%
+              </div>
+            </div>
+
+            {/* Kết thúc sau */}
+            <div className="relative h-[19.5px] left-7 top-[5px]">
+              <div className="text-[rgba(255,243,243,1)] text-[13px] font-bold text-left">
+                Kết thúc sau
+              </div>
+            </div>
+
+            {/* Time countdown */}
+            <div className="relative h-[19.5px] left-[31px] bottom-[4px]">
+              <div className="text-[20px] pointer-events-none flex gap-2">
+                <div className="countdown-item">
+                  <div>{time.hours}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.minutes}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.seconds}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : screenWidth >= 360 ? (
+        <div className="bg-flash-sale h-[61px] text-white">
+          <div className="flex">
+            <div className="top-[6px] left-[17px] w-6 h-[26px] relative coupon-transform">
+              <img
+                className="w-full h-full"
+                src="../../assets/svg/coupon.svg"
+                alt=""
+              />
+            </div>
+
+            <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
+              {formatPrice(
+                calcNetPrice(product.price, product.discountPercentage)
+              )}
+            </div>
+
+            {/* text FLASH SALE */}
+            <div className="relative w-fit h-[25.5px] left-[135px] !sm:left-[101px] top-[3px]">
+              <div className="text-white text-[17px] font-bold text-left">
+                FLASH SALE
+              </div>
+            </div>
+          </div>
+
+          <div className="flex">
+            {/* Initial price */}
+            <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
+              <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
+                <div className="bg-[rgb(196,188,188)]">
+                  {formatPrice(product.price)}
+                </div>
+              </div>
+            </div>
+
+            {/* How much percentage that saves */}
+            <div className="relative w-[130px] h-[19.5px] left-[20px] top-[5px]">
+              <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
+                Tiết kiệm tới {"  " + product.discountPercentage}%
+              </div>
+            </div>
+
+            {/* Kết thúc sau */}
+            {/* <div className="relative h-[19.5px] left-7 top-[5px]">
+              <div className="text-[rgba(255,243,243,1)] text-[13px] font-bold text-left">
+                Kết thúc sau
+              </div>
+            </div> */}
+
+            {/* Time countdown */}
+            <div className="relative h-[19.5px] left-[48px] bottom-[4px]">
+              <div className="text-[20px] pointer-events-none flex gap-2">
+                <div className="countdown-item">
+                  <div>{time.hours}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.minutes}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.seconds}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : screenWidth >= 320 ? (
+        <div className="bg-flash-sale h-[61px] text-white">
+          <div className="flex">
+            <div className="top-[6px] left-[17px] w-6 h-[26px] relative coupon-transform">
+              <img
+                className="w-full h-full"
+                src="../../assets/svg/coupon.svg"
+                alt=""
+              />
+            </div>
+
+            <div className="relative top-[6px] left-[30px] text-xl font-bold">
+              {formatPrice(
+                calcNetPrice(product.price, product.discountPercentage)
+              )}
+            </div>
+
+            {/* text FLASH SALE */}
+            <div className="relative w-fit h-[25.5px] left-[102px] !sm:left-[101px] top-[3px]">
+              <div className="text-white text-[17px] font-bold text-left">
+                FLASH SALE
+              </div>
+            </div>
+          </div>
+
+          <div className="flex">
+            {/* Initial price */}
+            <div className="relative w-14 h-[21px] left-[17px] top-[5px]">
+              <div className="text-[rgba(145,4,52,0.95)] text-xs text-center line-through border-solid">
+                <div className="bg-[rgb(196,188,188)]">
+                  {formatPrice(product.price)}
+                </div>
+              </div>
+            </div>
+
+            {/* How much percentage that saves */}
+            <div className="relative w-[110px] h-[19.5px] left-[20px] top-[5px]">
+              <div className="text-[rgba(247,247,247,1)] text-xs text-center">
+                Tiết kiệm tới {"  " + product.discountPercentage}%
+              </div>
+            </div>
+
+            {/* Kết thúc sau */}
+            {/* <div className="relative h-[19.5px] left-7 top-[5px]">
+              <div className="text-[rgba(255,243,243,1)] text-[10px] font-bold text-left">
+                Kết thúc sau
+              </div>
+            </div> */}
+
+            {/* Time countdown */}
+            <div className="relative h-[19.5px] left-[40px] bottom-[4px]">
+              <div className="text-[20px] pointer-events-none flex gap-2">
+                <div className="countdown-item">
+                  <div>{time.hours}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.minutes}</div>
+                </div>
+                <div className="countdown-item">
+                  <div>{time.seconds}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center text-yellow-600">
+          Màn hình quá nhỏ để hiển thị
+        </div>
+      )}
 
       <div className="px-2 py-1">
         {/* How many people watching */}
@@ -347,7 +625,7 @@ const DetailedProductPage = () => {
       >
         <img
           className="w-7 h-7"
-          src="https://content.pancake.vn/1/s427x427/fwebp/d7/1c/51/ef/5f0dbcc5e3e39c394faacdce01e02928dd44c6f7e41016c8156ee4f6.png"
+          src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/champion-img.webp"
           alt=""
         />
         <div className="ml-3 font-bold">Sản phẩm hàng đầu</div>
@@ -485,7 +763,7 @@ const DetailedProductPage = () => {
                       src={
                         el.reviewerImage ||
                         // a default avatar
-                        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.iconfinder.com%2Ficons%2F403017%2Favatar_default_head_person_unknown_user_anonym_icon&psig=AOvVaw2nkz09L6vcMZcUgTWgzKmh&ust=1733410089284000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDe3IOujooDFQAAAAAdAAAAABAo"
+                        "https://cdn1.iconfinder.com/data/icons/user-pictures/100/unknown-1024.png"
                       }
                       alt="avatar"
                     />
@@ -537,10 +815,10 @@ const DetailedProductPage = () => {
       {/* Mô tả */}
       <div
         className="border-[#e2e2e2] border-t-2 py-6
-        flex flex-col gap-3
+        flex flex-col gap-3 mx-1.5
         "
       >
-        <div>
+        <div className="text-justify">
           {product.description?.split("\n").map((item, index) => (
             <React.Fragment key={index}>
               {item}
@@ -550,7 +828,12 @@ const DetailedProductPage = () => {
         </div>
         <Image.PreviewGroup>
           {productImages.map((el) => (
-            <Image preview={false} src={el} />
+            <Image
+              width={screenWidth - 12}
+              height={screenWidth - 12}
+              preview={false}
+              src={el}
+            />
           ))}
         </Image.PreviewGroup>
       </div>
@@ -570,6 +853,7 @@ const DetailedProductPage = () => {
 
       <div ref={orderSectionRef}>
         <CreateOrder
+          screenWidth={screenWidth}
           product={product}
           productImages={productImages}
           tiers={productTiers || []}
@@ -585,7 +869,7 @@ const DetailedProductPage = () => {
         <div className="py-1 rounded-[11px] border-solid shadow-[0_8px_16px_0_rgba(0,0,0,0.2),0_6px_6px_0_rgba(0,0,0,0.19)] flex flex-col items-center">
           <img
             className="w-[78px] h-[78px]"
-            src="https://content.pancake.vn/1/s479x478/fwebp/05/13/fe/09/a6c1389b798dd4f556d391941f0fe695879d16c9d79bdf3ee26c674a.png"
+            src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/truck-img.webp"
             alt=""
           />
           <div className="text-[rgba(217,24,24,1)] text-sm">
@@ -598,7 +882,7 @@ const DetailedProductPage = () => {
         <div className="py-1 rounded-[11px] border-solid shadow-[0_8px_16px_0_rgba(0,0,0,0.2),0_6px_6px_0_rgba(0,0,0,0.19)] flex flex-col items-center">
           <img
             className="w-[78px] h-[78px]"
-            src="https://content.pancake.vn/1/s481x478/fwebp/3d/3a/2b/c7/f073fe38a69ef885514313e332672ab760034a84955999503204fdfd.png"
+            src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/swap-img.webp"
             alt=""
           />
           <div className="text-[rgba(217,24,24,1)] text-sm">
@@ -611,7 +895,7 @@ const DetailedProductPage = () => {
         <div className="py-1 rounded-[11px] border-solid shadow-[0_8px_16px_0_rgba(0,0,0,0.2),0_6px_6px_0_rgba(0,0,0,0.19)] flex flex-col items-center">
           <img
             className="w-[78px] h-[78px]"
-            src="https://content.pancake.vn/1/s480x478/fwebp/fd/e2/d8/d0/5f71537bce39cc8457b1585a0f18a5a8e6a72ce6477d696c3c486965.png"
+            src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/shield-img.webp"
             alt=""
           />
           <div className="text-[rgba(217,24,24,1)] text-sm">
@@ -624,7 +908,7 @@ const DetailedProductPage = () => {
         <div className="py-1 rounded-[11px] border-solid shadow-[0_8px_16px_0_rgba(0,0,0,0.2),0_6px_6px_0_rgba(0,0,0,0.19)] flex flex-col items-center">
           <img
             className="w-[78px] h-[78px]"
-            src="https://content.pancake.vn/1/s478x478/fwebp/8b/40/49/62/ae5d6fc38376318f7a9b13e1f9013894f89965972d5651106c05e553.png"
+            src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/like-reward-img.webp"
             alt=""
           />
           <div className="text-[rgba(217,24,24,1)] text-sm">
@@ -641,10 +925,15 @@ const DetailedProductPage = () => {
       </div>
 
       {/* Fixed box for quick checkout/order */}
-      <div className="fixed w-[420px] h-[67px] z-10 bottom-0 bg-white">
-        <div className="flex h-full items-center justify-between border shadow-[0px_0px_8px_0px_rgba(0,0,0,0.250)] border-solid">
+      <div
+        className={`fixed w-full max-w-[440px] h-[67px] z-10 bottom-0 bg-white`}
+      >
+        <div
+          className={`flex w-full h-full items-center justify-between border shadow-[0px_0px_8px_0px_rgba(0,0,0,0.250)] border-solid`}
+        >
           <div className="flex mx-4 gap-6">
             <div
+              // WILL UPDATE REF ANOTHER PRODUCTS
               onClick={() => (window.location.href = "/")}
               className="cursor-pointer flex flex-col items-center justify-center"
             >
@@ -653,29 +942,31 @@ const DetailedProductPage = () => {
                 src="../../assets/svg/blackShop.svg"
                 alt=""
               />
-              <div className="text-[10px]">Trang chủ</div>
+              <div className="text-[10px]">Shop</div>
             </div>
 
-            <div
-              onClick={() => handleScroll(feedbackSectionRef)}
-              className="cursor-pointer flex flex-col items-center justify-center"
-            >
-              <img
-                className="w-[23px] h-[23px]"
-                src="../../assets/svg/feedback.svg"
-                alt=""
-              />
-              <div className="text-[10px]">Feedback</div>
-            </div>
+            {screenWidth > 320 && (
+              <div
+                onClick={() => handleScroll(feedbackSectionRef)}
+                className="cursor-pointer flex flex-col items-center justify-center"
+              >
+                <img
+                  className="w-[23px] h-[23px]"
+                  src="../../assets/svg/feedback.svg"
+                  alt=""
+                />
+                <div className="text-[10px]">Feedback</div>
+              </div>
+            )}
           </div>
 
           <div className="flex mx-4 justify-between gap-3 items-center">
             <Button
               onClick={() => handleScroll(orderSectionRef)}
               variant="outlined"
-              className="flex flex-col w-28 h-[46px] gap-0
+              className={`flex flex-col h-[46px] gap-0 ${buyButtonWidthClass}
               text-[rgba(212,71,71,1)] text-sm font-bold rounded-none border-[rgba(229,92,118,1)] border-solid border-2
-              "
+              `}
               danger
             >
               <div className="font-gilroy">Thêm vào</div>
@@ -684,11 +975,12 @@ const DetailedProductPage = () => {
 
             <Button
               onClick={() => handleScroll(orderSectionRef)}
-              className="
-              mt-2 flex flex-col w-28 h-12 gap-0
+              className={`
+              ${buyButtonWidthClass}
+              mt-2 flex flex-col h-12 gap-0
               text-sm font-bold rounded-none font-gilroy
               animate-bounce
-              "
+              "`}
               color="danger"
               variant="solid"
             >

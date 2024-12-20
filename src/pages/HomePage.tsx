@@ -28,7 +28,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="p-4 max-w-[420px] mx-auto">
+    <div className="p-4 max-w-[440px] w-full mx-auto">
       {/* Products Section */}
       <h2 className="text-xl font-bold mb-4">Trang chủ</h2>
       <div className="grid grid-cols-1 gap-4">

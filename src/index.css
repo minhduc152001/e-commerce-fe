@@ -4,11 +4,11 @@
 
 body {
   @apply font-muli;
-  @apply w-[420px] mx-auto;
+  @apply max-w-[440px] w-full mx-auto;
 }
 
 .bg-flash-sale {
-  background-image: url(https://content.pancake.vn/1/s920x118/fwebp/72/97/30/c5/85a6c79791fe48974c8d6da615a523c9e47cade8247ba2c6f94866ee.jpg);
+  background-image: url(https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/bg-flash-sale.webp);
   background-position-x: center;
   background-position-y: center;
   background-size: cover;

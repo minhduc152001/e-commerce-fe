@@ -12,6 +12,14 @@ module.exports = {
         spartan: ["Spartan", "sans-serif"],
       },
     },
+    screens: {
+      // 320 360 390 412 440
+      sm: "320", // Small screens (≥ 320px)
+      md: "360", // Medium screens (≥ 360px)
+      lg: "390", // Large screens (≥ 390px)
+      xl: "412", // Extra large screens (≥ 412px)
+      "2xl": "440", // 2x Extra large screens (≥ 440px)
+    },
   },
   plugins: [],
 };
