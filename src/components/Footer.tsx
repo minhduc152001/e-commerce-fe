@@ -11,7 +11,7 @@ import React from "react";
 
 function Footer() {
   return (
-    <div className="mt-6 border-b border-solid border-b-neutral-600 pb-3 mx-1">
+    <div className="mt-6 border-b border-solid border-b-neutral-600 pb-3 mx-3">
       <div className="text-2xl flex flex-col gap-3">
         <div className="text-lg font-bold">THÔNG TIN LIÊN HỆ</div>
         <div className="flex items-center gap-3">

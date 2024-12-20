@@ -167,23 +167,23 @@ function CreateOrder({
   };
 
   return (
-    <div>
-      <div className="flex mx-3 gap-5 justify-center">
-        {/* {screenWidth > 375 && (
+    <div className="mx-2">
+      <div className="flex mx-3 gap-5 justify-between">
+        {screenWidth > 375 && (
           <Image
             preview={false}
             src={productImages[0]}
-            width={screenWidth*0.33}
-            height={screenWidth*0.33}
+            width={screenWidth * 0.33}
+            height={screenWidth * 0.33}
           />
-        )} */}
+        )}
 
         <div
           className={`flex flex-col text-center w-[${
             screenWidth > 375 ? "66%" : "100%"
           }]`}
         >
-          <div className="flex justify-between h-20 items-center">
+          <div className="flex gap-3 h-20 items-center">
             <Button
               className="w-[52px] h-[26px] font-bold !bg-[rgba(233,9,9,1)] border shadow-[0px_4px_4px_rgba(0,0,0,0.25)] rounded-md border-solid"
               color="danger"
@@ -217,7 +217,7 @@ function CreateOrder({
         </div>
       </div>
       <div className="flex items-center gap-2 ml-1">
-        <div className="text-sm">Thời gian dự kiến 3 - 5 ngày</div>
+        <div className="text-xs">Thời gian dự kiến 3 - 5 ngày</div>
         <div>
           <div className="flex gap-1">
             <div className="text-[rgb(233,9,9)] animate-pulse text-lg">

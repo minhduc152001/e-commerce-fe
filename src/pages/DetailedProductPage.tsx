@@ -815,27 +815,29 @@ const DetailedProductPage = () => {
       {/* Mô tả */}
       <div
         className="border-[#e2e2e2] border-t-2 py-6
-        flex flex-col gap-3 mx-1.5
+        flex flex-col gap-3
         "
       >
-        <div className="text-justify">
-          {product.description?.split("\n").map((item, index) => (
-            <React.Fragment key={index}>
-              {item}
-              <br />
-            </React.Fragment>
-          ))}
+        <div className="mx-3">
+          <div className="text-justify">
+            {product.description?.split("\n").map((item, index) => (
+              <React.Fragment key={index}>
+                {item}
+                <br />
+              </React.Fragment>
+            ))}
+          </div>
+          <Image.PreviewGroup>
+            {productImages.map((el) => (
+              <Image
+                width={screenWidth - 24}
+                height={screenWidth - 24}
+                preview={false}
+                src={el}
+              />
+            ))}
+          </Image.PreviewGroup>
         </div>
-        <Image.PreviewGroup>
-          {productImages.map((el) => (
-            <Image
-              width={screenWidth - 12}
-              height={screenWidth - 12}
-              preview={false}
-              src={el}
-            />
-          ))}
-        </Image.PreviewGroup>
       </div>
 
       {/* Bảng kích cỡ (nếu có) */}
