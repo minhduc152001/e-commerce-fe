@@ -10,6 +10,8 @@ module.exports = {
         quicksand: ["Quicksand", "sans-serif"],
         gilroy: ["Gilroy-Medium", "sans-serif"],
         spartan: ["Spartan", "sans-serif"],
+        jura: ["Jura", "sans-serif"],
+        crimson_pro: ["Crimson Pro", "sans-serif"],
       },
     },
     screens: {

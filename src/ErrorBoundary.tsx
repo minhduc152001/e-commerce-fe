@@ -44,8 +44,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             backgroundColor: "#f8f9fa",
           }}
         >
-          <h1 style={{ color: "red" }}>Something went wrong!</h1>
-          <p>{this.state.errorMessage}</p>
+          <h1 style={{ color: "red" }}>Ứng dụng đã thoát</h1>
           <button
             onClick={this.handleReload}
             style={{
@@ -59,7 +58,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               cursor: "pointer",
             }}
           >
-            Click to Continue
+            Ấn để tiếp tục
           </button>
         </div>
       );

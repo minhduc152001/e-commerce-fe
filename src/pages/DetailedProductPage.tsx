@@ -1,10 +1,11 @@
 import { EyeFilled, HeartFilled } from "@ant-design/icons";
-import { Avatar, Button, Carousel, Image, Table } from "antd";
+import { Avatar, Button, Card, Carousel, Image, Table } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   getProductAPI,
+  listProductsAPI,
   listReviewsByProductAPI,
   listTiersByProductAPI,
 } from "../api/axios";
@@ -25,6 +26,10 @@ const DetailedProductPage = () => {
   const [reviews, setReviews] = useState<TReview[]>();
   const [displayingReviews, setDisplayingReviews] = useState(reviews);
   const [productTiers, setProductTiers] = useState<TProductTier[]>();
+  const [anotherProducts, setAnotherProducts] =
+    useState<(TProduct & { randomSold: number })[]>();
+  const [visibleAnotherProductText, setVisibleAnotherProductText] =
+    useState(false);
 
   let currentSaleEndTime = Number(localStorage.getItem("saleEndTime")) || null;
   const nextSaleEndTime = Date.now() + (2 * 60 * 60 + 40 * 60) * 1000; // 2 hours & 36 minutes for flash sale
@@ -42,13 +47,13 @@ const DetailedProductPage = () => {
   );
   const [visibleProductImage, setVisibleProductImage] = useState(false);
   // Random
-  const [randomSoldCount, setRandomSoldCount] = useState<number>(0);
-  const [feedbackCount, setFeedbackCount] = useState(0);
+  const [randomSoldCount] = useState(() => generateRandomNumber(4000, 8000));
+  const [feedbackCount] = useState(() => generateRandomNumber(1000, 1500));
   const randomViews = getRandomElement(fakeViewCount);
   const [watchingPeopleCount, setWatchingPeopleCount] =
     useState<number>(randomViews);
 
-  // const shopSectionRef = useRef<HTMLDivElement>(null);
+  const anotherProductRef = useRef<HTMLDivElement>(null);
   const feedbackSectionRef = useRef<HTMLDivElement>(null);
   const orderSectionRef = useRef<HTMLDivElement>(null);
 
@@ -147,8 +152,14 @@ const DetailedProductPage = () => {
         const tiers = await listTiersByProductAPI(id);
         setProductTiers(tiers);
 
-        setRandomSoldCount(generateRandomNumber(4000, 8000));
-        setFeedbackCount(generateRandomNumber(1000, 1500));
+        // Get first 6 another products
+        const anotherProducts = (await listProductsAPI()).slice(0, 6);
+        setAnotherProducts(
+          anotherProducts.map((other) => ({
+            ...other,
+            randomSold: generateRandomNumber(4000, 8000),
+          }))
+        );
       } catch (error) {
         toast.error("Có lỗi xảy ra. Hãy thử lại");
       }
@@ -167,6 +178,8 @@ const DetailedProductPage = () => {
   }, []);
 
   useEffect(() => {
+    setVisibleAnotherProductText((prev) => !prev);
+
     if (timeLeft <= 0) return;
 
     const timer = setInterval(() => {
@@ -941,6 +954,89 @@ const DetailedProductPage = () => {
         </div>
       </div>
 
+      {/* SP khác */}
+      <div className="mt-8 mx-2" ref={anotherProductRef}>
+        <div className="text-center text-[22px] font-jura font-thin mb-6">
+          SẢN PHẨM ĐANG ĐƯỢC GIẢM GIÁ
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {anotherProducts?.map((other) => {
+            return (
+              <Card
+                className="border shadow-[2px_1px_2px_1px_rgba(0,0,0,0.25)] p-0"
+                style={{ width: "100%" }}
+                cover={
+                  <Image
+                    style={{
+                      borderTopLeftRadius: "8px",
+                      borderTopRightRadius: "8px",
+                      textAlign: "center",
+                    }}
+                    width={"100%"}
+                    height={screenWidth * 0.45}
+                    preview={false}
+                    src={other.productImage}
+                  />
+                }
+                actions={[
+                  <div className="flex items-center justify-center h-11 bg-[rgba(244,67,54,1)] font-bold rounded-bl-lg rounded-br-lg">
+                    <div className="text-white text-base animate-word-wrapper">
+                      <div>
+                        <span
+                          className={`${
+                            visibleAnotherProductText ? "visible" : "hidden"
+                          }`}
+                        >
+                          MUA HÀNG NGAY
+                        </span>
+                      </div>
+                      <div>
+                        <span
+                          className={`${
+                            !visibleAnotherProductText ? "visible" : "hidden"
+                          }`}
+                        >
+                          XEM CHI TIẾT
+                        </span>
+                      </div>
+                    </div>
+                  </div>,
+                ]}
+              >
+                <div className="py-3 px-2">
+                  <div className="leading-[1.3] text-sm font-medium text-center another-product-name uppercase mb-2">
+                    {other.name}
+                  </div>
+                  <div className="leading-[1.4] italic font-crimson_pro text-[13px] text-neutral-400 text-center">
+                    Chất liệu cao cấp . Quà tặng ý nghĩa cho bà và mẹ
+                  </div>
+                  <div className="flex justify-center gap-1 my-2.5">
+                    {[5, 4, 3, 2, 1].map(() => (
+                      <img
+                        src="../../assets/svg/star.svg"
+                        className="w-3 h-3"
+                        alt="sm-fill-star"
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-between items-center h-6">
+                    <div className="text-rose-600 text-base">
+                      {formatPrice(
+                        calcNetPrice(other.price, other.discountPercentage),
+                        "VNĐ"
+                      )}
+                    </div>
+                    <div className="italic text-xs text-neutral-400">
+                      Đã bán {formatShortNumber(other.randomSold)}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="mb-16">
         <Footer />
       </div>
@@ -952,10 +1048,9 @@ const DetailedProductPage = () => {
         <div
           className={`flex w-full h-full items-center justify-between border shadow-[0px_0px_8px_0px_rgba(0,0,0,0.250)] border-solid`}
         >
-          <div className="flex mx-4 gap-6">
+          <div className="flex ml-4 justify-between gap-3">
             <div
-              // WILL UPDATE REF ANOTHER PRODUCTS
-              onClick={() => (window.location.href = "/")}
+              onClick={() => handleScroll(anotherProductRef)}
               className="cursor-pointer flex flex-col items-center justify-center"
             >
               <img
@@ -963,7 +1058,7 @@ const DetailedProductPage = () => {
                 src="../../assets/svg/blackShop.svg"
                 alt=""
               />
-              <div className="text-[10px]">Shop</div>
+              <div className="text-[10px] w-fit">Cửa hàng</div>
             </div>
 
             {screenWidth > 320 && (

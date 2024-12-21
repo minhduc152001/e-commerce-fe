@@ -2,7 +2,7 @@ export function formatPrice(price: number, currency?: string): string {
   price = Math.floor(price);
 
   const formattedPrice = price.toLocaleString("vi-VN"); // Use Vietnamese locale for initial formatting
-  return `${formattedPrice}${currency ? ` ${currency}` : "đ"}`.replace(
+  return `${formattedPrice}${currency ? `${currency}` : "đ"}`.replace(
     ".",
     ","
   );
