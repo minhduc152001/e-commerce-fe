@@ -153,7 +153,9 @@ const DetailedProductPage = () => {
         setProductTiers(tiers);
 
         // Get first 6 another products
-        const anotherProducts = (await listProductsAPI()).slice(0, 6);
+        const anotherProducts = (await listProductsAPI())
+          .filter((el) => el.id !== id)
+          .slice(0, 6);
         setAnotherProducts(
           anotherProducts.map((other) => ({
             ...other,
@@ -979,7 +981,12 @@ const DetailedProductPage = () => {
                   />
                 }
                 actions={[
-                  <div className="flex items-center justify-center h-11 bg-[rgba(244,67,54,1)] font-bold rounded-bl-lg rounded-br-lg">
+                  <div
+                    onClick={() =>
+                      (window.location.href = `/product/${other.id}`)
+                    }
+                    className="flex items-center justify-center h-11 bg-[rgba(244,67,54,1)] font-bold rounded-bl-lg rounded-br-lg"
+                  >
                     <div className="text-white text-base animate-word-wrapper">
                       <div>
                         <span
