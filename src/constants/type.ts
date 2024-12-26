@@ -17,6 +17,7 @@ export type TProduct = {
   discountPercentage: number;
   stockQuantity: number;
   productImage: string;
+  subImages: string[];
   sizes: TSize[] | null;
   attributes?: TAttribute[];
 };

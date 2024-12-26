@@ -1,64 +1,64 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { TProduct } from "../constants/type";
-import { listProductsAPI } from "../api/axios";
 import { toast } from "react-toastify";
-import { formatPrice } from "../utils/format";
-import { calcNetPrice } from "../utils/calc";
+import { listProductsAPI } from "../api/axios";
+import OtherProducts from "../components/OtherProducts";
+import { TProduct } from "../constants/type";
+import { generateRandomNumber } from "../utils/random";
+import LoadingPage from "./LoadingPage";
 
 const HomePage = () => {
-  const navigate = useNavigate();
-
-  const [products, setProducts] = useState<TProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<
+    (TProduct & { randomSold: number })[]
+  >([]);
+  const [visibleAnotherProductText, setVisibleAnotherProductText] =
+    useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const products = await listProductsAPI();
-        setProducts(products);
+        setProducts(
+          products.map((other) => ({
+            ...other,
+            randomSold: generateRandomNumber(4000, 8000),
+          }))
+        );
       } catch (error) {
         toast.error("Có lỗi xảy ra. Hãy thử lại");
       }
+      setLoading(false);
     };
     fetchProducts();
   }, []);
 
-  const handleViewProduct = (id: string) => {
-    navigate(`/product/${id}`);
-  };
+  useEffect(() => {
+    setInterval(() => {
+      setVisibleAnotherProductText((prev) => !prev);
+    }, 1000);
+  }, []);
+
+  const innerWidth = window.innerWidth <= 440 ? window.innerWidth : 440;
+  const [screenWidth, setScreenWidth] = useState(innerWidth);
+  useEffect(() => {
+    const handleResize = () =>
+      setScreenWidth(window.innerWidth <= 440 ? window.innerWidth : 440);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (loading) return <LoadingPage />;
 
   return (
     <div className="p-4 max-w-[440px] w-full mx-auto">
       {/* Products Section */}
       <h2 className="text-xl font-bold mb-4">Trang chủ</h2>
-      <div className="grid grid-cols-1 gap-4">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="p-4 border rounded-lg flex justify-between items-center gap-1"
-          >
-            <div>
-              <h3 className="text-lg font-semibold">{product.name}</h3>
-              <div className="flex gap-3">
-                <div className="line-through text-red-900">
-                  {formatPrice(product.price)}
-                </div>
-                <div className="font-bold text-yellow-500">
-                  {formatPrice(
-                    calcNetPrice(product.price, product.discountPercentage)
-                  )}
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={() => handleViewProduct(product.id)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-              Xem
-            </button>
-          </div>
-        ))}
-      </div>
+      <OtherProducts
+        anotherProducts={products}
+        screenWidth={screenWidth}
+        visibleAnotherProductText={visibleAnotherProductText}
+      />
     </div>
   );
 };

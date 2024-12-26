@@ -19,6 +19,7 @@ import LoadingPage from "./LoadingPage";
 import { generateRandomNumber, getRandomElement } from "../utils/random";
 import { fakeViewCount } from "../fakeData/randomNumber";
 import { calcNetPrice } from "../utils/calc";
+import OtherProducts from "../components/OtherProducts";
 
 const DetailedProductPage = () => {
   const { id } = useParams();
@@ -46,6 +47,9 @@ const DetailedProductPage = () => {
     (currentSaleEndTime - Date.now()) / 1000
   );
   const [visibleProductImage, setVisibleProductImage] = useState(false);
+  const [visibleChest, setVisibleChest] = useState(false);
+  const [visibleWaist, setVisibleWaist] = useState(false);
+
   // Random
   const [randomSoldCount] = useState(() => generateRandomNumber(4000, 8000));
   const [feedbackCount] = useState(() => generateRandomNumber(1000, 1500));
@@ -111,14 +115,31 @@ const DetailedProductPage = () => {
       ? reviews.reduce((cur, acc) => cur + acc.rating, 0) / ratingCount
       : "Chưa có đánh giá";
 
-  const sizeImageTableData = product?.sizes?.map(
-    ({ height, weight, sizeName }, key) => ({
+  const sizeImageTableData = product?.sizes?.map((size, key) => {
+    const { height, weight, sizeName } = size;
+    const chest = size?.chest;
+    const waist = size?.waist;
+
+    return {
       key,
       sizeName,
       weight,
       height,
-    })
-  );
+      chest,
+      waist,
+    };
+  });
+
+  // Derive visibility flags after processing
+  const hasChest = product?.sizes?.some((size) => size?.chest);
+  const hasWaist = product?.sizes?.some((size) => size?.waist);
+
+  // Update state outside of the rendering process (e.g., inside a useEffect)
+  useEffect(() => {
+    setVisibleChest(!!hasChest);
+    setVisibleWaist(!!hasWaist);
+  }, [hasChest, hasWaist]);
+
   const sizeImageTableColumns = [
     {
       title: "Size",
@@ -136,6 +157,21 @@ const DetailedProductPage = () => {
       key: "height",
     },
   ];
+  if (visibleChest) {
+    sizeImageTableColumns.push({
+      title: "Vòng ngực",
+      dataIndex: "chest",
+      key: "chest",
+    });
+  }
+
+  if (visibleWaist) {
+    sizeImageTableColumns.push({
+      title: "Vòng eo",
+      dataIndex: "waist",
+      key: "waist",
+    });
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,9 +189,7 @@ const DetailedProductPage = () => {
         setProductTiers(tiers);
 
         // Get first 6 another products
-        const anotherProducts = (await listProductsAPI())
-          .filter((el) => el.id !== id)
-          .slice(0, 6);
+        const anotherProducts = (await listProductsAPI()).slice(0, 6);
         setAnotherProducts(
           anotherProducts.map((other) => ({
             ...other,
@@ -226,7 +260,9 @@ const DetailedProductPage = () => {
 
   const productImages = [];
   const mainProductImage = product.productImage;
+  const subProductImages = product.subImages;
   mainProductImage && productImages.push(mainProductImage);
+  subProductImages && productImages.push(...subProductImages);
   productImages.push(...(product.attributes?.map((attr) => attr.image) || []));
 
   const buyButtonWidthClass = screenWidth < 390 ? "w-24" : "w-28";
@@ -961,87 +997,14 @@ const DetailedProductPage = () => {
         <div className="text-center text-[22px] font-jura font-thin mb-6">
           SẢN PHẨM ĐANG ĐƯỢC GIẢM GIÁ
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {anotherProducts?.map((other) => {
-            return (
-              <Card
-                className="border shadow-[2px_1px_2px_1px_rgba(0,0,0,0.25)] p-0"
-                style={{ width: "100%" }}
-                cover={
-                  <Image
-                    style={{
-                      borderTopLeftRadius: "8px",
-                      borderTopRightRadius: "8px",
-                      textAlign: "center",
-                    }}
-                    width={"100%"}
-                    height={screenWidth * 0.45}
-                    preview={false}
-                    src={other.productImage}
-                  />
-                }
-                actions={[
-                  <div
-                    onClick={() =>
-                      (window.location.href = `/product/${other.id}`)
-                    }
-                    className="flex items-center justify-center h-11 bg-[rgba(244,67,54,1)] font-bold rounded-bl-lg rounded-br-lg"
-                  >
-                    <div className="text-white text-base animate-word-wrapper">
-                      <div>
-                        <span
-                          className={`${
-                            visibleAnotherProductText ? "visible" : "hidden"
-                          }`}
-                        >
-                          MUA HÀNG NGAY
-                        </span>
-                      </div>
-                      <div>
-                        <span
-                          className={`${
-                            !visibleAnotherProductText ? "visible" : "hidden"
-                          }`}
-                        >
-                          XEM CHI TIẾT
-                        </span>
-                      </div>
-                    </div>
-                  </div>,
-                ]}
-              >
-                <div className="py-3 px-2">
-                  <div className="leading-[1.3] text-sm font-medium text-center another-product-name uppercase mb-2">
-                    {other.name}
-                  </div>
-                  <div className="leading-[1.4] italic font-crimson_pro text-[13px] text-neutral-400 text-center">
-                    Chất liệu cao cấp . Quà tặng ý nghĩa cho bà và mẹ
-                  </div>
-                  <div className="flex justify-center gap-1 my-2.5">
-                    {[5, 4, 3, 2, 1].map(() => (
-                      <img
-                        src="../../assets/svg/star.svg"
-                        className="w-3 h-3"
-                        alt="sm-fill-star"
-                      />
-                    ))}
-                  </div>
-                  <div className="flex justify-between items-center h-6">
-                    <div className="text-rose-600 text-base">
-                      {formatPrice(
-                        calcNetPrice(other.price, other.discountPercentage),
-                        "VNĐ"
-                      )}
-                    </div>
-                    <div className="italic text-xs text-neutral-400">
-                      Đã bán {formatShortNumber(other.randomSold)}
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
+
+        {anotherProducts && (
+          <OtherProducts
+            anotherProducts={anotherProducts}
+            screenWidth={screenWidth}
+            visibleAnotherProductText={visibleAnotherProductText}
+          />
+        )}
       </div>
 
       <div className="mb-16">

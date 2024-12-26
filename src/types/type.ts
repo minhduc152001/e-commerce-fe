@@ -36,6 +36,8 @@ export type TSize = {
   sizeName: string;
   weight: string;
   height: string;
+  chest?: string;
+  waist?: string;
 };
 
 export type TOrder = {

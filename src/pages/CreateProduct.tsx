@@ -1,16 +1,26 @@
 import {
+  DeleteOutlined,
   MinusCircleOutlined,
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { Button, Form, Input, InputNumber, Select, Space, Upload } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Space,
+  Upload,
+} from "antd";
 import { Option } from "antd/es/mentions";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { axiosInstance } from "../api/axios";
 import { uploadImageAPI } from "../api/uploadImage";
 import { EAttributeType } from "../constants/enum";
-import { TSize } from "../types/type";
+import { TProductTier, TSize } from "../types/type";
 
 type FieldType = {
   categoryId: string;
@@ -20,7 +30,9 @@ type FieldType = {
   discountPercentage: number; // from 0 to 100
   stockQuantity: number;
   productImage: any;
-  attributes: TAttribute[];
+  colorAttributes: TAttribute[];
+  codeAttributes: TAttribute[];
+  productTiers: TProductTier[];
   sizes: TSize[];
 };
 
@@ -49,16 +61,29 @@ function CreateProduct() {
       }
 
       // Extract files for attributes
-      const attributes = values.attributes?.map((attribute) => {
-        const attributeImageFile = attribute.image?.fileList[0]?.originFileObj;
+      const colorAttributes =
+        values.colorAttributes?.map((el) => ({
+          ...el,
+          type: EAttributeType.Color,
+        })) || [];
+      const codeAttributes =
+        values.codeAttributes?.map((el) => ({
+          ...el,
+          type: EAttributeType.Code,
+        })) || [];
+      const attributes = colorAttributes
+        .concat(codeAttributes)
+        ?.map((attribute) => {
+          const attributeImageFile =
+            attribute.image?.fileList[0]?.originFileObj;
 
-        return {
-          ...attribute,
-          image: attributeImageFile
-            ? uploadImageAPI(attributeImageFile) // Upload to S3
-            : null,
-        };
-      });
+          return {
+            ...attribute,
+            image: attributeImageFile
+              ? uploadImageAPI(attributeImageFile) // Upload to S3
+              : null,
+          };
+        });
 
       // Upload all attribute images and replace with URLs
       setLoading(true);
@@ -73,7 +98,8 @@ function CreateProduct() {
       setLoading(false);
 
       // Final product submission
-      const productData = { ...values, attributes: attributesWithUrls };
+      const { codeAttributes: _, colorAttributes: __, ...vitalData } = values;
+      const productData = { ...vitalData, attributes: attributesWithUrls };
 
       // Make an API call to save productData in your database
       setLoading(true);
@@ -81,7 +107,7 @@ function CreateProduct() {
 
       toast.success("Tạo sản phẩm thành công!");
       setLoading(false);
-      form.resetFields();
+      // form.resetFields();
     } catch (error) {
       setLoading(false);
       toast.error("Đã có lỗi xảy ra!");
@@ -89,7 +115,7 @@ function CreateProduct() {
   };
 
   return (
-    <div>
+    <div className="mx-2">
       <div className="text-xl font-bold text-center py-5">Tạo Sản Phẩm Mới</div>
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Form.Item
@@ -169,29 +195,47 @@ function CreateProduct() {
                         message: "Nhập tên kích thước (Size S, Size M,...)",
                       },
                     ]}
+                    label="Tên"
                   >
-                    <Input placeholder="Tên kích thước" />
+                    <Input />
                   </Form.Item>
 
                   <Form.Item
                     {...restField}
                     name={[name, "weight"]}
+                    label="Nặng"
                     rules={[
                       { required: true, message: "Nhập trọng lượng (kg)" },
                     ]}
                   >
-                    <Input placeholder="Cân nặng (kg)" style={{ width: 120 }} />
+                    <Input />
                   </Form.Item>
 
                   <Form.Item
                     {...restField}
                     name={[name, "height"]}
+                    label="Cao"
                     rules={[{ required: true, message: "Nhập chiều cao (cm)" }]}
                   >
-                    <Input
-                      placeholder="Chiều cao (cm)"
-                      style={{ width: 120 }}
-                    />
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    name={[name, "waist"]}
+                    label="Eo"
+                    // rules={[{ required: true, message: "Nhập vòng eo (cm)" }]}
+                  >
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    name={[name, "chest"]}
+                    label="Ngực"
+                    // rules={[{ required: true, message: "Nhập vòng ngực (cm)" }]}
+                  >
+                    <Input />
                   </Form.Item>
 
                   <MinusCircleOutlined onClick={() => remove(name)} />
@@ -211,36 +255,36 @@ function CreateProduct() {
           )}
         </Form.List>
 
-        <div className="font-bold">
-          Nhập các thuộc tính như mã code, màu sắc (nếu có)
-        </div>
-        <Form.List name="attributes">
+        <div className="font-bold">Nhập các biến thể (nếu có)</div>
+        <Form.List name="codeAttributes">
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
                 <Space key={key} align="baseline">
+                  <Form.Item {...restField} name={[name, "type"]}>
+                    <Select
+                      placeholder="Chọn"
+                      style={{ width: 100 }}
+                      disabled
+                      defaultValue={"CODE"}
+                      suffixIcon={<></>}
+                    >
+                      {/* <Option value="COLOR">Màu sắc</Option> */}
+                      <Option value="CODE">Biến thể</Option>
+                    </Select>
+                  </Form.Item>
+
                   <Form.Item
                     {...restField}
                     name={[name, "name"]}
                     rules={[
                       {
                         required: true,
-                        message: "Nhập tên (TN11, XL, Vàng trắng...)",
+                        message: "Nhập tên (TN11, AB02...)",
                       },
                     ]}
                   >
-                    <Input placeholder="Tên thuộc tính" />
-                  </Form.Item>
-
-                  <Form.Item
-                    {...restField}
-                    name={[name, "type"]}
-                    rules={[{ required: true, message: "Thiếu phân loại" }]}
-                  >
-                    <Select placeholder="Select type" style={{ width: 120 }}>
-                      <Option value="COLOR">COLOR</Option>
-                      <Option value="CODE">CODE</Option>
-                    </Select>
+                    <Input placeholder="Tên biến thể" />
                   </Form.Item>
 
                   <Form.Item
@@ -252,9 +296,9 @@ function CreateProduct() {
                       name="file"
                       beforeUpload={(file) => {
                         const attributes =
-                          form.getFieldValue("attributes") || [];
+                          form.getFieldValue("codeAttributes") || [];
                         attributes[name] = { ...attributes[name], image: file };
-                        form.setFieldsValue({ attributes });
+                        form.setFieldsValue({ codeAttributes: attributes });
                         return false;
                       }}
                       listType="picture"
@@ -275,7 +319,180 @@ function CreateProduct() {
                   block
                   icon={<PlusOutlined />}
                 >
-                  Thêm Thuộc tính
+                  Thêm Biến thể
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+
+        <div className="font-bold">Nhập màu sắc (nếu có)</div>
+        <Form.List name="colorAttributes">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space key={key} align="baseline">
+                  <Form.Item {...restField} name={[name, "type"]}>
+                    <Select
+                      placeholder="Chọn"
+                      style={{ width: 100 }}
+                      disabled
+                      defaultValue={"COLOR"}
+                      suffixIcon={<></>}
+                    >
+                      <Option value="COLOR">Màu sắc</Option>
+                      {/* <Option value="CODE">Biến thể</Option> */}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    name={[name, "name"]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Nhập tên (Vàng trắng...)",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Màu sắc" />
+                  </Form.Item>
+
+                  <Form.Item
+                    {...restField}
+                    name={[name, "image"]}
+                    className="max-w-[168px] text-center"
+                  >
+                    <Upload
+                      name="file"
+                      beforeUpload={(file) => {
+                        const attributes =
+                          form.getFieldValue("colorAttributes") || [];
+                        attributes[name] = { ...attributes[name], image: file };
+                        form.setFieldsValue({ colorAttributes: attributes });
+                        return false;
+                      }}
+                      listType="picture"
+                      accept="image/*"
+                      maxCount={1}
+                    >
+                      <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                    </Upload>
+                  </Form.Item>
+
+                  <MinusCircleOutlined onClick={() => remove(name)} />
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Thêm Màu sắc
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+
+        <div className="font-bold">Nhập combo sản phẩm</div>
+        <Form.List name="productTiers">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => {
+                return (
+                  <div className="flex gap-2">
+                    <Space
+                      key={key}
+                      align="baseline"
+                      direction="vertical"
+                      size="middle"
+                      style={{
+                        display: "flex",
+                        marginBottom: "20px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Card
+                        title={
+                          <div className="flex justify-between">
+                            <div>Combo {name + 1}</div>
+                            <DeleteOutlined
+                              className="text-red-600 text-lg"
+                              onClick={() => remove(name)}
+                            />
+                          </div>
+                        }
+                        className="px-2"
+                      >
+                        <Form.Item
+                          className="pt-2"
+                          {...restField}
+                          label="Số lượng"
+                          name={[name, "quantity"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Nhập số lượng",
+                            },
+                          ]}
+                        >
+                          <InputNumber min={1} className="w-full" />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, "description"]}
+                          label="Mô tả (hiển thị với KH - VD: MUA 1 BỘ GIÁ 280,000đ + 25k SHIP)"
+                          rules={[
+                            { required: true, message: "Hãy thêm mô tả" },
+                          ]}
+                        >
+                          <Input placeholder="MUA 2 BỘ GIÁ: 400,000đ + FREE SHIP" />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, "price"]}
+                          label="Giá"
+                          rules={[{ required: true, message: "Hãy nhập giá" }]}
+                        >
+                          <InputNumber
+                            formatter={(value) => `đ ${value}`}
+                            min={0}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, "shippingFee"]}
+                          label="Phí ship (nhập 0 cho free ship)"
+                          rules={[
+                            { required: true, message: "Nhập phí vận chuyển" },
+                          ]}
+                        >
+                          <InputNumber
+                            formatter={(value) => `đ ${value}`}
+                            min={0}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                      </Card>
+                    </Space>
+                  </div>
+                );
+              })}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Thêm Combo
                 </Button>
               </Form.Item>
             </>
