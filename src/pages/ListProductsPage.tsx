@@ -17,7 +17,7 @@ const ListProductsPage = () => {
   // Fetch products on component mount or pagination change
   useEffect(() => {
     fetchProducts();
-  }, [pagination.current]);
+  }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
