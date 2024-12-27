@@ -32,12 +32,12 @@ jobs:
       # Step 5: Copy build folder to the server
       - name: Copy build folder to server
         run: |
-          scp -o StrictHostKeyChecking=no -r ./build ubuntu@15.235.167.234:./e-commerce-apps/frontend
+          scp -o StrictHostKeyChecking=no -r ./build root@14.225.207.134:./e-commerce-apps/frontend
 
       # Step 6: Restart the app using PM2
       - name: Restart application
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@15.235.167.234 << 'EOF'
+          ssh -o StrictHostKeyChecking=no root@14.225.207.134 << 'EOF'
           cd ./e-commerce-apps/frontend
           pm2 stop e-commerce-frontend || true
           pm2 delete e-commerce-frontend || true

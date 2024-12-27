@@ -3,7 +3,7 @@ import { TProduct, TReview } from "../constants/type";
 import { TOrder, TOrderAndProductName, TProductTier } from "../types/type";
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_ENDPOINT || "http://15.235.167.234:6789",
+  baseURL: process.env.REACT_APP_API_ENDPOINT || "http://14.225.207.134:6789",
   timeout: 90000,
   maxBodyLength: Infinity,
   headers: {
