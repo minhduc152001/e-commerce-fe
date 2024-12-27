@@ -4,12 +4,14 @@ import {
   PhoneFilled,
   SecurityScanOutlined,
   ShoppingCartOutlined,
-  TikTokOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import React from "react";
 
-function Footer() {
+type Props = {
+  externalLink?: string;
+};
+
+function Footer({ externalLink }: Props) {
   return (
     <div className="mt-6 border-b border-solid border-b-neutral-600 pb-3 mx-3">
       <div className="text-2xl flex flex-col gap-3">
@@ -28,10 +30,18 @@ function Footer() {
           <MailOutlined />
           <div className="text-sm">Email: vuhuuduy25121999@gmail.com</div>
         </div>
-        <div className="flex items-center gap-3">
-          <TikTokOutlined />
-          <div className="text-sm">tiktok.com/unique_user_id</div>
-        </div>
+        {externalLink && (
+          <div className="flex items-center gap-3">
+            <img
+              alt="shopee-icon"
+              src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/shopee.png"
+              className="w-6 h-6"
+            />
+            <a href={externalLink} className="text-sm text-nowrap truncate font-bold">
+              {externalLink}
+            </a>
+          </div>
+        )}
       </div>
 
       <div className="text-2xl flex flex-col gap-3 mt-5">

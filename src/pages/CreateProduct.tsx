@@ -29,11 +29,12 @@ type FieldType = {
   price: number;
   discountPercentage: number; // from 0 to 100
   stockQuantity: number;
-  productImage: any;
+  productImages: any;
   colorAttributes: TAttribute[];
   codeAttributes: TAttribute[];
   productTiers: TProductTier[];
   sizes: TSize[];
+  externalLink: string;
 };
 
 // Attribute
@@ -51,13 +52,20 @@ function CreateProduct() {
   const onFinish = async (values: FieldType) => {
     try {
       // Upload product image if present
-      if (values.productImage) {
-        const imageFile = values.productImage?.fileList[0]?.originFileObj;
-        setLoading(true);
-        const imageUrl = await uploadImageAPI(imageFile);
-        setLoading(false);
+      let productImage: string = "";
+      let subImages: string[] = [];
 
-        values.productImage = imageUrl;
+      if (values.productImages) {
+        const imageFiles = values.productImages?.fileList;
+        setLoading(true);
+        const imageUrls = await Promise.all(
+          imageFiles?.map(async (file: any) => {
+            return await uploadImageAPI(file.originFileObj);
+          })
+        );
+
+        productImage = imageUrls.shift();
+        subImages.push(...imageUrls);
       }
 
       // Extract files for attributes
@@ -98,8 +106,18 @@ function CreateProduct() {
       setLoading(false);
 
       // Final product submission
-      const { codeAttributes: _, colorAttributes: __, ...vitalData } = values;
-      const productData = { ...vitalData, attributes: attributesWithUrls };
+      const {
+        codeAttributes: _,
+        colorAttributes: __,
+        productImages: ___,
+        ...vitalData
+      } = values;
+      const productData = {
+        ...vitalData,
+        productImage,
+        subImages,
+        attributes: attributesWithUrls,
+      };
 
       // Make an API call to save productData in your database
       setLoading(true);
@@ -107,11 +125,12 @@ function CreateProduct() {
 
       toast.success("Tạo sản phẩm thành công!");
       setLoading(false);
-      // form.resetFields();
+      form.resetFields();
     } catch (error) {
-      setLoading(false);
       toast.error("Đã có lỗi xảy ra!");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -160,24 +179,127 @@ function CreateProduct() {
         </Form.Item>
 
         <Form.Item
-          label="Ảnh đại diện sản phẩm (nên sử dụng ảnh 800x800)"
-          name="productImage"
+          label="Ảnh sản phẩm (nên sử dụng ảnh 800x800) - tối đa 20"
+          name="productImages"
           rules={[
             { required: true, message: "Nhập ảnh đại diện cho sản phẩm" },
           ]}
         >
           <Upload
             beforeUpload={(file) => {
-              form.setFieldsValue({ productImage: file }); // Save the file object
+              form.setFieldsValue({ productImages: file }); // Save the file object
               return false; // Prevent automatic upload
             }}
             listType="picture"
             accept="image/*"
-            maxCount={1}
+            maxCount={20}
+            multiple={true}
           >
             <Button icon={<UploadOutlined />}>Nhập ảnh</Button>
           </Upload>
         </Form.Item>
+
+        <div className="font-bold">Nhập combo sản phẩm</div>
+        <Form.List name="productTiers">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => {
+                return (
+                  <div className="flex gap-2">
+                    <Space
+                      key={key}
+                      align="baseline"
+                      direction="vertical"
+                      size="middle"
+                      style={{
+                        display: "flex",
+                        marginBottom: "20px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Card
+                        title={
+                          <div className="flex justify-between">
+                            <div>Combo {name + 1}</div>
+                            <DeleteOutlined
+                              className="text-red-600 text-lg"
+                              onClick={() => remove(name)}
+                            />
+                          </div>
+                        }
+                        className="px-2"
+                      >
+                        <Form.Item
+                          className="pt-2"
+                          {...restField}
+                          label="Số lượng"
+                          name={[name, "quantity"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Nhập số lượng",
+                            },
+                          ]}
+                        >
+                          <InputNumber min={1} className="w-full" />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, "description"]}
+                          label="Mô tả (hiển thị với KH - VD: MUA 1 BỘ GIÁ 280,000đ + 25k SHIP)"
+                          rules={[
+                            { required: true, message: "Hãy thêm mô tả" },
+                          ]}
+                        >
+                          <Input placeholder="MUA 2 BỘ GIÁ: 400,000đ + FREE SHIP" />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, "price"]}
+                          label="Giá"
+                          rules={[{ required: true, message: "Hãy nhập giá" }]}
+                        >
+                          <InputNumber
+                            formatter={(value) => `đ ${value}`}
+                            min={0}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+
+                        <Form.Item
+                          {...restField}
+                          name={[name, "shippingFee"]}
+                          label="Phí ship (nhập 0 cho free ship)"
+                          rules={[
+                            { required: true, message: "Nhập phí vận chuyển" },
+                          ]}
+                        >
+                          <InputNumber
+                            formatter={(value) => `đ ${value}`}
+                            min={0}
+                            style={{ width: "100%" }}
+                          />
+                        </Form.Item>
+                      </Card>
+                    </Space>
+                  </div>
+                );
+              })}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Thêm Combo
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
 
         {/* Sizes Field */}
         <div className="font-bold">Nhập kích thước sản phẩm (nếu có)</div>
@@ -397,107 +519,12 @@ function CreateProduct() {
           )}
         </Form.List>
 
-        <div className="font-bold">Nhập combo sản phẩm</div>
-        <Form.List name="productTiers">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => {
-                return (
-                  <div className="flex gap-2">
-                    <Space
-                      key={key}
-                      align="baseline"
-                      direction="vertical"
-                      size="middle"
-                      style={{
-                        display: "flex",
-                        marginBottom: "20px",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Card
-                        title={
-                          <div className="flex justify-between">
-                            <div>Combo {name + 1}</div>
-                            <DeleteOutlined
-                              className="text-red-600 text-lg"
-                              onClick={() => remove(name)}
-                            />
-                          </div>
-                        }
-                        className="px-2"
-                      >
-                        <Form.Item
-                          className="pt-2"
-                          {...restField}
-                          label="Số lượng"
-                          name={[name, "quantity"]}
-                          rules={[
-                            {
-                              required: true,
-                              message: "Nhập số lượng",
-                            },
-                          ]}
-                        >
-                          <InputNumber min={1} className="w-full" />
-                        </Form.Item>
-
-                        <Form.Item
-                          {...restField}
-                          name={[name, "description"]}
-                          label="Mô tả (hiển thị với KH - VD: MUA 1 BỘ GIÁ 280,000đ + 25k SHIP)"
-                          rules={[
-                            { required: true, message: "Hãy thêm mô tả" },
-                          ]}
-                        >
-                          <Input placeholder="MUA 2 BỘ GIÁ: 400,000đ + FREE SHIP" />
-                        </Form.Item>
-
-                        <Form.Item
-                          {...restField}
-                          name={[name, "price"]}
-                          label="Giá"
-                          rules={[{ required: true, message: "Hãy nhập giá" }]}
-                        >
-                          <InputNumber
-                            formatter={(value) => `đ ${value}`}
-                            min={0}
-                            style={{ width: "100%" }}
-                          />
-                        </Form.Item>
-
-                        <Form.Item
-                          {...restField}
-                          name={[name, "shippingFee"]}
-                          label="Phí ship (nhập 0 cho free ship)"
-                          rules={[
-                            { required: true, message: "Nhập phí vận chuyển" },
-                          ]}
-                        >
-                          <InputNumber
-                            formatter={(value) => `đ ${value}`}
-                            min={0}
-                            style={{ width: "100%" }}
-                          />
-                        </Form.Item>
-                      </Card>
-                    </Space>
-                  </div>
-                );
-              })}
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  Thêm Combo
-                </Button>
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
+        <Form.Item
+          label="Link sản phẩm (shopee,...)"
+          name="externalLink"
+        >
+          <Input placeholder="https://shopee.vn/buy/san-pham-ao" />
+        </Form.Item>
 
         <Form.Item>
           <Button loading={loading} type="primary" htmlType="submit" block>

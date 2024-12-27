@@ -11,6 +11,7 @@ import { EAttributeType } from "../constants/enum";
 import { TAttribute } from "../constants/type";
 import { TOrder, TProductTier, TSize } from "../types/type";
 import { formatPrice } from "../utils/format";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -142,6 +143,9 @@ const ListOrderPage = () => {
       title: "Thời gian tạo",
       dataIndex: "createdAt",
       key: "createdAt",
+      render: (date: string) => (
+        <div>{dayjs(date).format('HH:mm - DD/MM/YYYY')}</div>
+      ),
     },
     {
       title: "Trạng thái",

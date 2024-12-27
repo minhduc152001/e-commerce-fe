@@ -1,5 +1,5 @@
 import { EyeFilled, HeartFilled } from "@ant-design/icons";
-import { Avatar, Button, Card, Carousel, Image, Table } from "antd";
+import { Avatar, Button, Carousel, Image, Table } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -12,14 +12,14 @@ import {
 import CreateOrder from "../components/CreateOrder";
 import Footer from "../components/Footer";
 import ImageFeedbackShow from "../components/ImageFeedbackShow";
-import { TProduct, TReview } from "../constants/type";
-import { TProductTier } from "../types/type";
-import { formatPrice, formatShortNumber } from "../utils/format";
-import LoadingPage from "./LoadingPage";
-import { generateRandomNumber, getRandomElement } from "../utils/random";
-import { fakeViewCount } from "../fakeData/randomNumber";
-import { calcNetPrice } from "../utils/calc";
 import OtherProducts from "../components/OtherProducts";
+import { TProduct, TReview } from "../constants/type";
+import { fakeViewCount } from "../fakeData/randomNumber";
+import { TProductTier } from "../types/type";
+import { calcNetPrice } from "../utils/calc";
+import { formatPrice, formatShortNumber } from "../utils/format";
+import { generateRandomNumber, getRandomElement } from "../utils/random";
+import LoadingPage from "./LoadingPage";
 
 const DetailedProductPage = () => {
   const { id } = useParams();
@@ -1008,7 +1008,7 @@ const DetailedProductPage = () => {
       </div>
 
       <div className="mb-16">
-        <Footer />
+        <Footer externalLink={product.externalLink} />
       </div>
 
       {/* Fixed box for quick checkout/order */}

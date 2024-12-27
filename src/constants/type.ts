@@ -19,6 +19,7 @@ export type TProduct = {
   productImage: string;
   subImages: string[];
   sizes: TSize[] | null;
+  externalLink?: string;
   attributes?: TAttribute[];
 };
 
