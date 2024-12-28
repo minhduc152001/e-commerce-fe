@@ -18,17 +18,15 @@ function Footer({ externalLink }: Props) {
         <div className="text-lg font-bold">THÔNG TIN LIÊN HỆ</div>
         <div className="flex items-center gap-3">
           <HomeFilled />
-          <div className="text-sm">
-            Địa chỉ: 25 Lê Lợi, TT Vấn Đình, Ứng Hòa , Hà Nội
-          </div>
+          <div className="text-sm">Địa chỉ: Quảng Phú Cầu, Ứng Hòa, Hà Nội</div>
         </div>
         <div className="flex items-center gap-3">
           <PhoneFilled />
-          <div className="text-sm">Hotline: 083.2970.078</div>
+          <div className="text-sm">Hotline: 0987.086.488</div>
         </div>
         <div className="flex items-center gap-3">
           <MailOutlined />
-          <div className="text-sm">Email: vuhuuduy25121999@gmail.com</div>
+          <div className="text-sm">Email: lvas.offical@gmail.com</div>
         </div>
         {externalLink && (
           <div className="flex items-center gap-3">
@@ -37,7 +35,10 @@ function Footer({ externalLink }: Props) {
               src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/shopee.png"
               className="w-6 h-6"
             />
-            <a href={externalLink} className="text-sm text-nowrap truncate font-bold">
+            <a
+              href={externalLink}
+              className="text-sm text-nowrap truncate font-bold"
+            >
               {externalLink}
             </a>
           </div>

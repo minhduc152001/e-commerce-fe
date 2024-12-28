@@ -53,6 +53,7 @@ const DetailedProductPage = () => {
   // Random
   const [randomSoldCount] = useState(() => generateRandomNumber(4000, 8000));
   const [feedbackCount] = useState(() => generateRandomNumber(1000, 1500));
+  const [randomRestCount] = useState(() => generateRandomNumber(30, 60));
   const randomViews = getRandomElement(fakeViewCount);
   const [watchingPeopleCount, setWatchingPeopleCount] =
     useState<number>(randomViews);
@@ -258,6 +259,10 @@ const DetailedProductPage = () => {
 
   if (!product) return <LoadingPage />;
 
+  const salePercent = product.discountPercentage;
+  const initPrice = product.price;
+  const netPrice = calcNetPrice(initPrice, salePercent);
+
   const productImages = [];
   const mainProductImage = product.productImage;
   const subProductImages = product.subImages;
@@ -301,9 +306,7 @@ const DetailedProductPage = () => {
             </div>
 
             <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
-              {formatPrice(
-                calcNetPrice(product.price, product.discountPercentage)
-              )}
+              {formatPrice(netPrice)}
             </div>
 
             {/* text FLASH SALE */}
@@ -319,7 +322,7 @@ const DetailedProductPage = () => {
             <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
               <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
                 <div className="bg-[rgb(196,188,188)]">
-                  {formatPrice(product.price)}
+                  {formatPrice(initPrice)}
                 </div>
               </div>
             </div>
@@ -327,7 +330,7 @@ const DetailedProductPage = () => {
             {/* How much percentage that saves */}
             <div className="relative w-[130px] h-[19.5px] left-[20px] top-[5px]">
               <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
-                Tiết kiệm tới {"  " + product.discountPercentage}%
+                Tiết kiệm tới {"  " + salePercent}%
               </div>
             </div>
 
@@ -366,9 +369,7 @@ const DetailedProductPage = () => {
             </div>
 
             <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
-              {formatPrice(
-                calcNetPrice(product.price, product.discountPercentage)
-              )}
+              {formatPrice(netPrice)}
             </div>
 
             {/* text FLASH SALE */}
@@ -384,7 +385,7 @@ const DetailedProductPage = () => {
             <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
               <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
                 <div className="bg-[rgb(196,188,188)]">
-                  {formatPrice(product.price)}
+                  {formatPrice(initPrice)}
                 </div>
               </div>
             </div>
@@ -392,7 +393,7 @@ const DetailedProductPage = () => {
             {/* How much percentage that saves */}
             <div className="relative w-[112px] h-[19.5px] left-[20px] top-[5px]">
               <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
-                Tiết kiệm tới {"  " + product.discountPercentage}%
+                Tiết kiệm tới {"  " + salePercent}%
               </div>
             </div>
 
@@ -431,9 +432,7 @@ const DetailedProductPage = () => {
             </div>
 
             <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
-              {formatPrice(
-                calcNetPrice(product.price, product.discountPercentage)
-              )}
+              {formatPrice(netPrice)}
             </div>
 
             {/* text FLASH SALE */}
@@ -449,7 +448,7 @@ const DetailedProductPage = () => {
             <div className="relative w-16 h-[21px] left-2.5 top-[5px]">
               <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
                 <div className="bg-[rgb(196,188,188)]">
-                  {formatPrice(product.price)}
+                  {formatPrice(initPrice)}
                 </div>
               </div>
             </div>
@@ -457,7 +456,7 @@ const DetailedProductPage = () => {
             {/* How much percentage that saves */}
             <div className="relative w-[110px] h-[19.5px] left-2.5 top-[5px]">
               <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
-                Tiết kiệm tới {"  " + product.discountPercentage}%
+                Tiết kiệm tới {"  " + salePercent}%
               </div>
             </div>
 
@@ -496,9 +495,7 @@ const DetailedProductPage = () => {
             </div>
 
             <div className="relative top-[6px] left-[30px] text-[21px] font-bold">
-              {formatPrice(
-                calcNetPrice(product.price, product.discountPercentage)
-              )}
+              {formatPrice(netPrice)}
             </div>
 
             {/* text FLASH SALE */}
@@ -514,7 +511,7 @@ const DetailedProductPage = () => {
             <div className="relative w-16 h-[21px] left-[17px] top-[5px]">
               <div className="text-[rgba(145,4,52,0.95)] text-sm text-center line-through border-solid">
                 <div className="bg-[rgb(196,188,188)]">
-                  {formatPrice(product.price)}
+                  {formatPrice(initPrice)}
                 </div>
               </div>
             </div>
@@ -522,7 +519,7 @@ const DetailedProductPage = () => {
             {/* How much percentage that saves */}
             <div className="relative w-[130px] h-[19.5px] left-[20px] top-[5px]">
               <div className="text-[rgba(247,247,247,1)] text-[13px] text-center">
-                Tiết kiệm tới {"  " + product.discountPercentage}%
+                Tiết kiệm tới {"  " + salePercent}%
               </div>
             </div>
 
@@ -561,9 +558,7 @@ const DetailedProductPage = () => {
             </div>
 
             <div className="relative top-[6px] left-[30px] text-xl font-bold">
-              {formatPrice(
-                calcNetPrice(product.price, product.discountPercentage)
-              )}
+              {formatPrice(netPrice)}
             </div>
 
             {/* text FLASH SALE */}
@@ -579,7 +574,7 @@ const DetailedProductPage = () => {
             <div className="relative w-14 h-[21px] left-[17px] top-[5px]">
               <div className="text-[rgba(145,4,52,0.95)] text-xs text-center line-through border-solid">
                 <div className="bg-[rgb(196,188,188)]">
-                  {formatPrice(product.price)}
+                  {formatPrice(initPrice)}
                 </div>
               </div>
             </div>
@@ -587,7 +582,7 @@ const DetailedProductPage = () => {
             {/* How much percentage that saves */}
             <div className="relative w-[110px] h-[19.5px] left-[20px] top-[5px]">
               <div className="text-[rgba(247,247,247,1)] text-xs text-center">
-                Tiết kiệm tới {"  " + product.discountPercentage}%
+                Tiết kiệm tới {"  " + salePercent}%
               </div>
             </div>
 
@@ -677,6 +672,98 @@ const DetailedProductPage = () => {
             <span className="ml-1 font-bold">
               {formatShortNumber(randomSoldCount)}
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Chỉ còn 30-60 sp cuối cùng */}
+      <div className="my-1.5 px-2">
+        <div className="manual-animate-pulse text-[15px] text-center text-neutral-600">
+          Sắp hết hàng chỉ còn{" "}
+          <span className="text-rose-600 font-bold">{randomRestCount}</span> sản
+          phẩm cuối cùng
+        </div>
+
+        <div className="flex justify-between mt-3">
+          <div className="flex flex-col w-[60%]">
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-neutral-600 line-through">
+                {formatPrice(initPrice, " VNĐ")}
+              </div>
+              <div className="text-red-600 manual-animate-pulse text-[21px] font-bold">
+                {formatPrice(netPrice, " VNĐ")}
+              </div>
+            </div>
+            <div className="text-xs text-neutral-950">
+              Tiết kiệm lên tới :{" "}
+              <span className="font-bold">
+                {formatPrice(initPrice - netPrice, "VNĐ")}
+              </span>
+            </div>
+          </div>
+
+          <div className="text-sm rounded-[79px] bg-red-500 text-white font-bold px-3.5 py-1.5 flex items-center">
+            Giảm sốc {salePercent}%
+          </div>
+        </div>
+
+        <img
+          className="mt-3"
+          src="https://e-commerce-tuan-anh.s3.ap-southeast-1.amazonaws.com/Screenshot+2024-12-28+at+11.19.45.png"
+          alt="marketing"
+        />
+
+        <div className="my-2 w-full h-[22px]">
+          <div className="h-full w-full bg-neutral-500 rounded-[100px]">
+            <div className="h-full w-[79%] text-white bg-red-500 rounded-s-[100px]">
+              <div className="h-full flex gap-3 pl-5 manual-animate-headShake">
+                <img
+                  className="py-0.5"
+                  width={16}
+                  height={16}
+                  src="../../assets/svg/lightning.svg"
+                  alt="lightning"
+                />
+                <span className="text-sm font-bold">Nhanh tay lên</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center font-bold text-[15px] mb-3">
+          Thời gian khuyến mãi kết thúc sau
+        </div>
+
+        <div className="flex justify-center gap-5 font-bold text-xl">
+          <div className="flex flex-col items-center">
+            <div>00</div>
+            <div>Ngày</div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div>{time.hours}</div>
+            <div>Giờ</div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div>{time.minutes}</div>
+            <div>Phút</div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div>{time.seconds}</div>
+            <div>Giây</div>
+          </div>
+        </div>
+
+        <div className="w-full flex justify-center">
+          <div
+            className="cursor-pointer rounded-[10px] bg-red-500 text-white w-fit font-extrabold px-6 py-3 my-3"
+            onClick={() => handleScroll(orderSectionRef)}
+          >
+            ĐẶT HÀNG NGAY
+          </div>
+        </div>
+        <div className="relative left-[60%] -top-3.5 w-2.5 h-2.5">
+          <div className="rotate-[123deg] w-28 h-9">
+            <div className="bg-point-hand"></div>
           </div>
         </div>
       </div>
