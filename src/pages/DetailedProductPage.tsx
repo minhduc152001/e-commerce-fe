@@ -999,7 +999,7 @@ const DetailedProductPage = () => {
 
       {/* Bảng kích cỡ (nếu có) */}
       {sizeImageTableData?.length && (
-        <div className="mb-6">
+        <div className="mb-6 mx-1.5">
           <div className="font-bold">Bảng kích cỡ size</div>
           <Table
             columns={sizeImageTableColumns}
