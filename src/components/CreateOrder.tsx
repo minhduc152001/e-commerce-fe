@@ -181,7 +181,7 @@ function CreateOrder({
         <div
           className={`flex flex-col text-center ${
             screenWidth > 375 ? "w-[66%]" : "w-full"
-          }] w-[66%]`}
+          }`}
         >
           <div className="flex gap-3 h-20 items-center">
             <Button
